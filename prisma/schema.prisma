@@ -6,21 +6,20 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String   @id @default(cuid())
-  email         String   @unique
-  name          String?
-  password      String?  // For email/password auth (optional, can use Supabase Auth instead)
-  isPremium     Boolean  @default(false)
-  isAdmin       Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String?
+  isPremium Boolean  @default(false)
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  // Relations
   accounts      Account[]
   transactions  Transaction[]
   budgets       Budget[]
@@ -47,26 +46,26 @@ model Account {
 }
 
 model Transaction {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accountId   String?
-  account     Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
-  categoryId  String?
-  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  type        String   // expense, income, transfer
-  amount     Float
-  currency    String   @default("MVR")
-  description String?
-  merchantName String?
-  date        String
-  time        String?
-  note        String?
-  isRecurring Boolean  @default(false)
-  isExcluded  Boolean  @default(false)
-  tags        String[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId     String?
+  account       Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  categoryId    String?
+  category      Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  type          String
+  amount        Float
+  currency      String   @default("MVR")
+  description   String?
+  merchantName  String?
+  date          String
+  time          String?
+  note          String?
+  isRecurring   Boolean  @default(false)
+  isExcluded    Boolean  @default(false)
+  tags          String   @default("[]")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Category {
@@ -76,7 +75,7 @@ model Category {
   name      String
   icon      String?
   color     String?
-  type      String   // expense, income
+  type      String
   isSystem  Boolean  @default(false)
   sortOrder Int      @default(0)
   isActive  Boolean  @default(true)
@@ -94,7 +93,7 @@ model Budget {
   category        Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   name            String
   amount          Float
-  period          String   @default("monthly") // weekly, monthly, yearly
+  period          String   @default("monthly")
   startDate       String?
   rollover        Boolean  @default(false)
   alertThreshold  Int      @default(75)
@@ -106,19 +105,19 @@ model Budget {
 }
 
 model Goal {
-  id                String   @id @default(cuid())
-  userId            String
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name              String
-  type              String   // savings, debt_payoff, emergency_fund, purchase, investment
-  targetAmount      Float
-  currentAmount    Float    @default(0)
-  targetDate       String
-  icon              String?
-  color             String?
-  status            String   @default("active") // active, paused, completed
-  monthlyContribution Float @default(0)
-  completedAt      DateTime?
-  createdAt        DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                String
+  type                String
+  targetAmount        Float
+  currentAmount       Float    @default(0)
+  targetDate          String
+  icon                String?
+  color               String?
+  status              String   @default("active")
+  monthlyContribution Float    @default(0)
+  completedAt         DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
