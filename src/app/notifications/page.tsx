@@ -32,56 +32,7 @@ interface Notification {
 
 export default function NotificationsPage() {
   const [filter, setFilter] = React.useState<"all" | "unread">("all");
-  const [notifications, setNotifications] = React.useState<Notification[]>([
-    {
-      id: "1",
-      type: "budget_alert",
-      title: "Budget Alert: Dining Out",
-      message: "You've used 75% of your Dining Out budget ($375/$500). Consider reducing spending.",
-      isRead: false,
-      createdAt: "2 hours ago",
-    },
-    {
-      id: "2",
-      type: "goal_milestone",
-      title: "Goal Milestone: Emergency Fund",
-      message: "Congratulations! You've reached 50% of your Emergency Fund goal ($5,000/$10,000).",
-      isRead: false,
-      createdAt: "Yesterday",
-    },
-    {
-      id: "3",
-      type: "insight",
-      title: "Spending Insight",
-      message: "Your grocery spending is 15% lower than last month. Great job!",
-      isRead: true,
-      createdAt: "2 days ago",
-    },
-    {
-      id: "4",
-      type: "bill_reminder",
-      title: "Bill Reminder: Netflix",
-      message: "Netflix ($15.99) is due tomorrow. Make sure you have sufficient funds.",
-      isRead: true,
-      createdAt: "3 days ago",
-    },
-    {
-      id: "5",
-      type: "anomaly",
-      title: "Unusual Transaction Detected",
-      message: "A new transaction of $89.99 at Electronics Store was detected. Was this you?",
-      isRead: false,
-      createdAt: "4 days ago",
-    },
-    {
-      id: "6",
-      type: "system",
-      title: "Account Connected",
-      message: "Your Chase Bank account has been successfully connected.",
-      isRead: true,
-      createdAt: "1 week ago",
-    },
-  ]);
+  const [notifications, setNotifications] = React.useState<Notification[]>([]);
 
   const filteredNotifications = filter === "unread" 
     ? notifications.filter(n => !n.isRead)

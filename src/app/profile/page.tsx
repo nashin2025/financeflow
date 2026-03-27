@@ -54,16 +54,10 @@ export default function ProfilePage() {
     { label: "Transactions", value: totalTransactions, icon: CreditCard },
     { label: "Accounts", value: totalAccounts, icon: TrendingUp },
     { label: "Active Goals", value: activeGoals, icon: Target },
-    { label: "Achievements", value: 5, icon: Award },
+    { label: "Achievements", value: achievements.length, icon: Award },
   ];
 
-  const achievements = [
-    { icon: "🎯", title: "First Budget Created", description: "Created your first budget", date: "Jan 2024" },
-    { icon: "💰", title: "Savings Starter", description: "Saved Rf 1,000 in a goal", date: "Feb 2024" },
-    { icon: "📊", title: "Tracking Pro", description: "Logged 50 transactions", date: "Mar 2024" },
-    { icon: "🎉", title: "Goal Crusher", description: "Completed first goal", date: "Apr 2024" },
-    { icon: "🔥", title: "Streak Master", description: "7-day login streak", date: "Nov 2024" },
-  ];
+  const achievements: { icon: string; title: string; description: string; date: string }[] = [];
 
   return (
     <div className="min-h-screen">
