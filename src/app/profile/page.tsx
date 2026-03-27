@@ -50,14 +50,14 @@ export default function ProfilePage() {
   const activeGoals = goals.filter(g => g.status === "active").length;
   const completedGoals = goals.filter(g => g.status === "completed").length;
 
+  const achievements: { icon: string; title: string; description: string; date: string }[] = [];
+
   const stats = [
     { label: "Transactions", value: totalTransactions, icon: CreditCard },
     { label: "Accounts", value: totalAccounts, icon: TrendingUp },
     { label: "Active Goals", value: activeGoals, icon: Target },
     { label: "Achievements", value: achievements.length, icon: Award },
   ];
-
-  const achievements: { icon: string; title: string; description: string; date: string }[] = [];
 
   return (
     <div className="min-h-screen">
