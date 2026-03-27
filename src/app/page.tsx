@@ -60,10 +60,15 @@ export default function DashboardPage() {
               <h1 className="text-2xl font-bold text-foreground mb-2">Welcome to FinanceFlow</h1>
               <p className="text-foreground-secondary mb-6">Track your finances, set budgets, and achieve your financial goals.</p>
               <div className="space-y-3">
-                <Link href="/add">
+                <Link href="/signup">
                   <Button className="w-full">
                     <Plus className="h-4 w-4 mr-2" />
                     Get Started - Add Your First Account
+                  </Button>
+                </Link>
+                <Link href="/login">
+                  <Button variant="secondary" className="w-full">
+                    Sign In
                   </Button>
                 </Link>
                 <p className="text-sm text-foreground-tertiary">Sign up to save your data and access premium features</p>
