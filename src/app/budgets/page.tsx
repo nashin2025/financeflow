@@ -96,10 +96,15 @@ export default function BudgetsPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
-                November 2024
+                {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
               </h1>
               <p className="text-foreground-secondary mt-1">
-                15 days remaining
+                {(() => {
+                  const now = new Date();
+                  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+                  const remaining = lastDay - now.getDate();
+                  return `${remaining} day${remaining !== 1 ? 's' : ''} remaining`;
+                })()}
               </p>
             </div>
             <Link href="/add">

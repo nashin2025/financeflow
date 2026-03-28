@@ -162,26 +162,6 @@ export default function AccountsPage() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Mock connected bank */}
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-primary-start/20 flex items-center justify-center">
-                        <Building2 className="h-5 w-5 text-primary-start" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-foreground">Chase Bank</p>
-                        <p className="text-xs text-foreground-tertiary">Connected</p>
-                      </div>
-                    </div>
-                    <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                  </div>
-                  <p className="text-xs text-foreground-secondary mb-3">Last synced: 5 minutes ago</p>
-                  <Button variant="ghost" size="sm" className="w-full">
-                    Manage Connection
-                  </Button>
-                </div>
-
                 {/* Add new connection */}
                 <button className="p-4 rounded-xl border-2 border-dashed border-white/10 hover:border-primary-start/50 hover:bg-primary-start/5 transition-all flex flex-col items-center justify-center gap-2 text-foreground-secondary hover:text-primary-start min-h-[120px]">
                   <Plus className="h-5 w-5" />

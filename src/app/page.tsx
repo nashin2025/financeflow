@@ -142,8 +142,8 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex items-center mt-3 text-sm">
                   <ArrowUpRight className="h-4 w-4 text-success mr-1" />
-                  <span className="text-success">+{formatPercentage(2.3)}</span>
-                  <span className="text-foreground-tertiary ml-1">this month</span>
+                  <span className="text-success">{totalIncome > 0 ? `+${formatPercentage(((totalIncome - totalExpenses) / totalIncome) * 100)}` : 'N/A'}</span>
+                  <span className="text-foreground-tertiary ml-1">savings rate</span>
                 </div>
               </CardContent>
             </Card>

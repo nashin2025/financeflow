@@ -64,14 +64,29 @@ export default function AnalyticsPage() {
 
   const netWorth = accounts.reduce((sum, a) => sum + a.balance, 0);
 
-  const monthlyData = [
-    { month: "Jun", income: 5200, expenses: 4100 },
-    { month: "Jul", income: 5200, expenses: 4500 },
-    { month: "Aug", income: 5700, expenses: 4200 },
-    { month: "Sep", income: 5200, expenses: 4800 },
-    { month: "Oct", income: 5500, expenses: 4300 },
-    { month: "Nov", income: 5200, expenses: 3970 },
-  ];
+  const monthlyData = React.useMemo(() => {
+    const last6Months = [];
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date();
+      date.setMonth(date.getMonth() - i);
+      const monthStr = date.toLocaleDateString('en-US', { month: 'short' });
+      
+      const monthTransactions = transactions.filter(t => {
+        const tDate = new Date(t.date);
+        return tDate.getMonth() === date.getMonth() && tDate.getFullYear() === date.getFullYear();
+      });
+      
+      const income = monthTransactions
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
+      const expenses = monthTransactions
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+      
+      last6Months.push({ month: monthStr, income, expenses });
+    }
+    return last6Months;
+  }, [transactions]);
 
   const maxExpense = Math.max(...monthlyData.map(d => d.expenses));
 
@@ -178,7 +193,11 @@ export default function AnalyticsPage() {
                       </div>
                     </div>
                     <p className="text-sm text-foreground-tertiary mt-3">
-                      15 days into November
+                      {(() => {
+                        const now = new Date();
+                        const month = now.toLocaleDateString('en-US', { month: 'long' });
+                        return `${now.getDate()} days into ${month}`;
+                      })()}
                     </p>
                   </CardContent>
                 </Card>
