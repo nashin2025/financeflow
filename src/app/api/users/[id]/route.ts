@@ -1,24 +1,14 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
-export async function PUT(request: Request) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { searchParams } = new URL(request.url)
-    const adminSecret = searchParams.get('secret')
-
-    if (adminSecret !== process.env.ADMIN_SECRET) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
+    const { id } = await params
     const body = await request.json()
-    const { userId, isPremium } = body
-
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID required' }, { status: 400 })
-    }
+    const { isPremium } = body
 
     const user = await prisma.user.update({
-      where: { id: userId },
+      where: { id },
       data: { isPremium: isPremium ?? true },
       select: {
         id: true,
@@ -35,24 +25,12 @@ export async function PUT(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { searchParams } = new URL(request.url)
-    const adminSecret = searchParams.get('secret')
-
-    if (adminSecret !== process.env.ADMIN_SECRET) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const { searchParams: urlSearchParams } = new URL(request.url)
-    const userId = urlSearchParams.get('userId')
-
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID required' }, { status: 400 })
-    }
+    const { id } = await params
 
     await prisma.user.delete({
-      where: { id: userId }
+      where: { id }
     })
 
     return NextResponse.json({ message: 'User deleted successfully' })

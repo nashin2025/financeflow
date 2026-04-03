@@ -204,7 +204,7 @@ export default function ProfilePage() {
                   </div>
                   <div>
                     <p className="text-sm text-foreground-tertiary">Location</p>
-                    <p className="text-foreground">Male', Maldives</p>
+                    <p className="text-foreground">Male&apos;, Maldives</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-white/5">
