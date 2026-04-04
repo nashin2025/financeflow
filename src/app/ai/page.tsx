@@ -66,7 +66,7 @@ export default function AIPage() {
   const creditAccounts = accounts.filter(a => a.type === "credit_card" || a.type === "loan" || a.type === "mortgage");
   const debtScoreCalc = creditAccounts.length > 0
     ? Math.max(0, 100 - (creditAccounts.reduce((s, a) => s + Number(a.balance), 0) / (totalBalance || 1)) * 100)
-    : 100;
+    : 0;
   const emergencyScoreCalc = totalBalance > 0 ? Math.min((totalBalance / (currentMonthExpenses || 1)) * (100 / 3), 100) : 0;
   const consistencyScoreCalc = hasTransactions ? Math.min((transactions.length / 20) * 100, 100) : 0;
 
