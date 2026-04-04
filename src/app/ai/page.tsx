@@ -45,12 +45,37 @@ export default function AIPage() {
   const [isTyping, setIsTyping] = React.useState(false);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
-  const healthScore = 72;
-  const savingsScore = 80;
-  const budgetScore = 65;
-  const debtScore = 85;
-  const emergencyScore = 70;
-  const consistencyScore = 60;
+  const now = new Date();
+  const currentMonthNum = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  const currentMonthTransactions = transactions.filter(t => {
+    const d = new Date(t.date);
+    return d.getMonth() === currentMonthNum && d.getFullYear() === currentYear;
+  });
+
+  const currentMonthIncome = currentMonthTransactions.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+  const currentMonthExpenses = currentMonthTransactions.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+  const totalBalance = accounts.reduce((sum, a) => sum + a.balance, 0);
+  const hasTransactions = transactions.length > 0;
+
+  const savings = currentMonthIncome > 0 ? Math.min(((currentMonthIncome - currentMonthExpenses) / currentMonthIncome) * 100, 100) : 0;
+  const budgetScoreCalc = budgets.length > 0
+    ? Math.min(budgets.reduce((s, b) => s + Math.max(0, 100 - (b.spent / b.amount) * 100), 0) / budgets.length, 100)
+    : 0;
+  const creditAccounts = accounts.filter(a => a.type === "credit_card" || a.type === "loan" || a.type === "mortgage");
+  const debtScoreCalc = creditAccounts.length > 0
+    ? Math.max(0, 100 - (creditAccounts.reduce((s, a) => s + Number(a.balance), 0) / (totalBalance || 1)) * 100)
+    : 0;
+  const emergencyScoreCalc = totalBalance > 0 ? Math.min((totalBalance / (currentMonthExpenses || 1)) * (100 / 3), 100) : 0;
+  const consistencyScoreCalc = hasTransactions ? Math.min((transactions.length / 20) * 100, 100) : 0;
+
+  const healthScore = Math.round((savings + budgetScoreCalc + debtScoreCalc + emergencyScoreCalc + consistencyScoreCalc) / 5);
+  const savingsScore = Math.round(savings);
+  const budgetScore = Math.round(budgetScoreCalc);
+  const debtScore = Math.round(debtScoreCalc);
+  const emergencyScore = Math.round(emergencyScoreCalc);
+  const consistencyScore = Math.round(consistencyScoreCalc);
 
   const totalExpenses = transactions
     .filter(t => t.type === "expense")
@@ -219,6 +244,7 @@ export default function AIPage() {
         
         <main className="p-4 lg:p-6 pb-20 lg:pb-6 space-y-6">
           {/* Financial Health Score */}
+          {hasTransactions && (
           <Card variant="glass" className="bg-gradient-to-r from-primary-start/10 to-primary-end/10 border-primary-start/20">
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row md:items-center gap-6">
@@ -236,7 +262,7 @@ export default function AIPage() {
                     <h2 className="text-xl font-semibold text-foreground">Financial Health Score</h2>
                   </div>
                   <p className="text-foreground-secondary mb-4">
-                    Your overall financial health is <span className="text-success font-medium">Good</span>. Keep making smart decisions!
+                    Your overall financial health is <span className={healthScore >= 60 ? 'text-success font-medium' : 'text-warning font-medium'}>{healthScore >= 80 ? 'Excellent' : healthScore >= 60 ? 'Good' : healthScore >= 40 ? 'Fair' : healthScore >= 20 ? 'Needs Improvement' : 'Just Starting'}</span>. {healthScore >= 60 ? 'Keep making smart decisions!' : 'Start building better habits today.'}
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                     {[
@@ -264,6 +290,7 @@ export default function AIPage() {
               </div>
             </CardContent>
           </Card>
+          )}
 
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Chat Interface */}
