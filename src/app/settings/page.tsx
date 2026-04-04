@@ -92,6 +92,8 @@ export default function SettingsPage() {
   const [showPasswordModal, setShowPasswordModal] = React.useState(false);
   const [showLoginHistoryModal, setShowLoginHistoryModal] = React.useState(false);
   const [passwordData, setPasswordData] = React.useState({ current: "", new: "", confirm: "" });
+  const [passwordError, setPasswordError] = React.useState("");
+  const [passwordIsLoading, setPasswordIsLoading] = React.useState(false);
 
   const handleUpgrade = () => {
     setShowUpgradeMsg(true);
@@ -124,18 +126,38 @@ export default function SettingsPage() {
     setShowDeleteModal(false);
   };
 
-  const handlePasswordChange = () => {
+  const handlePasswordChange = async () => {
     if (passwordData.new !== passwordData.confirm) {
-      alert("New passwords don't match!");
+      setPasswordError("New passwords don't match!");
       return;
     }
-    if (passwordData.new.length < 6) {
-      alert("Password must be at least 6 characters!");
+    if (passwordData.new.length < 8) {
+      setPasswordError("Password must be at least 8 characters!");
       return;
     }
-    alert("Password changed successfully!");
-    setPasswordData({ current: "", new: "", confirm: "" });
-    setShowPasswordModal(false);
+    setPasswordIsLoading(true);
+    setPasswordError("");
+    try {
+      const response = await fetch("/api/auth/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentPassword: passwordData.current,
+          newPassword: passwordData.new,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setPasswordError(data.error || "Failed to change password");
+        return;
+      }
+      setPasswordData({ current: "", new: "", confirm: "" });
+      setShowPasswordModal(false);
+    } catch {
+      setPasswordError("Something went wrong");
+    } finally {
+      setPasswordIsLoading(false);
+    }
   };
 
   const loginHistory = [

@@ -1,6 +1,17 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { verifyJWT, getAuthCookieName } from '@/lib/auth'
+import { verifyAccessJWT } from '@/lib/auth'
+
+const publicApiPaths = [
+  '/api/auth/login',
+  '/api/auth/register',
+  '/api/auth/logout',
+  '/api/auth/refresh',
+  '/api/auth/forgot-password',
+  '/api/auth/reset-password',
+  '/api/auth/me',
+  '/api/auth/change-password',
+]
 
 const protectedPaths = [
   '/api/transactions',
@@ -9,6 +20,7 @@ const protectedPaths = [
   '/api/goals',
   '/api/categories',
   '/api/notifications',
+  '/api/me',
 ]
 
 const adminPaths = [
@@ -16,8 +28,17 @@ const adminPaths = [
   '/api/admin',
 ]
 
+function getCookie(request: NextRequest, name: string): string | undefined {
+  const cookies = request.cookies.getAll()
+  return cookies.find(c => c.name === name)?.value
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  if (publicApiPaths.some(path => pathname.startsWith(path))) {
+    return NextResponse.next()
+  }
 
   const isProtected = protectedPaths.some(path => pathname.startsWith(path))
   const isAdminPath = adminPaths.some(path => pathname.startsWith(path))
@@ -26,18 +47,20 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  const cookieName = getAuthCookieName()
-  const token = request.cookies.get(cookieName)?.value
+  const accessToken = getCookie(request, '__Host-ff-access') || getCookie(request, 'ff-access')
 
-  if (!token) {
+  if (!accessToken) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const payload = await verifyJWT(token)
+  const payload = await verifyAccessJWT(accessToken)
 
   if (!payload) {
     const response = NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 })
-    response.cookies.delete(cookieName)
+    response.cookies.delete('__Host-ff-access')
+    response.cookies.delete('__Host-ff-refresh')
+    response.cookies.delete('ff-access')
+    response.cookies.delete('ff-refresh')
     return response
   }
 
