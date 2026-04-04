@@ -9,10 +9,14 @@ const publicPaths = ["/login", "/signup", "/forgot-password", "/reset-password"]
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { setUser, logout } = useAppStore();
+  const { setUser, logout, isAuthenticated } = useAppStore();
   const [isChecking, setIsChecking] = React.useState(true);
+  const hasCheckedRef = React.useRef(false);
 
   React.useEffect(() => {
+    if (hasCheckedRef.current) return;
+    hasCheckedRef.current = true;
+
     async function checkAuth() {
       try {
         const response = await fetch("/api/auth/me");
@@ -26,21 +30,21 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
           });
 
           if (publicPaths.includes(pathname)) {
-            router.push("/");
+            router.replace("/");
             return;
           }
         } else {
           logout();
 
           if (!publicPaths.includes(pathname)) {
-            router.push("/login");
+            router.replace("/login");
             return;
           }
         }
       } catch {
         logout();
         if (!publicPaths.includes(pathname)) {
-          router.push("/login");
+          router.replace("/login");
           return;
         }
       } finally {
@@ -50,20 +54,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
     checkAuth();
   }, []);
-
-  React.useEffect(() => {
-    if (isChecking) return;
-
-    const { isAuthenticated } = useAppStore.getState();
-
-    if (!isAuthenticated && !publicPaths.includes(pathname)) {
-      router.push("/login");
-    }
-
-    if (isAuthenticated && publicPaths.includes(pathname)) {
-      router.push("/");
-    }
-  }, [isChecking, pathname, router]);
 
   if (isChecking) {
     return (
