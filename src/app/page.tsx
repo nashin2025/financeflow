@@ -45,7 +45,84 @@ export default function DashboardPage() {
 
   const recentTransactions = transactions.slice(0, 5);
   const currentDate = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  const currentMonth = new Date().toLocaleString('default', { month: 'long' });
+
+  const now = new Date();
+  const currentMonthNum = now.getMonth();
+  const currentYear = now.getFullYear();
+  const lastMonthNum = currentMonthNum === 0 ? 11 : currentMonthNum - 1;
+  const lastMonthYear = currentMonthNum === 0 ? currentYear - 1 : currentYear;
+
+  const currentMonthTransactions = transactions.filter(t => {
+    const d = new Date(t.date);
+    return d.getMonth() === currentMonthNum && d.getFullYear() === currentYear;
+  });
+  const lastMonthTransactions = transactions.filter(t => {
+    const d = new Date(t.date);
+    return d.getMonth() === lastMonthNum && d.getFullYear() === lastMonthYear;
+  });
+
+  const currentMonthIncome = currentMonthTransactions.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+  const lastMonthIncome = lastMonthTransactions.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+  const currentMonthExpenses = currentMonthTransactions.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+  const lastMonthExpenses = lastMonthTransactions.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+
+  const incomeChange = lastMonthIncome > 0 ? ((currentMonthIncome - lastMonthIncome) / lastMonthIncome) * 100 : null;
+  const expenseChange = lastMonthExpenses > 0 ? ((currentMonthExpenses - lastMonthExpenses) / lastMonthExpenses) * 100 : null;
+
+  const currentSavingsRate = currentMonthIncome > 0 ? ((currentMonthIncome - currentMonthExpenses) / currentMonthIncome) * 100 : 0;
+  const lastSavingsRate = lastMonthIncome > 0 ? ((lastMonthIncome - lastMonthExpenses) / lastMonthIncome) * 100 : 0;
+  const savingsRateChange = lastMonthIncome > 0 ? currentSavingsRate - lastSavingsRate : null;
+
+  const last6MonthsExpenses = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    const monthTxns = transactions.filter(t => {
+      const td = new Date(t.date);
+      return td.getMonth() === d.getMonth() && td.getFullYear() === d.getFullYear() && t.type === "expense";
+    });
+    last6MonthsExpenses.push(monthTxns.reduce((s, t) => s + t.amount, 0));
+  }
+  const avg6MonthExpenses = last6MonthsExpenses.length > 0 ? last6MonthsExpenses.reduce((s, v) => s + v, 0) / last6MonthsExpenses.length : 0;
+  const vsAvgChange = avg6MonthExpenses > 0 ? ((currentMonthExpenses - avg6MonthExpenses) / avg6MonthExpenses) * 100 : null;
+
+  const diningCategory = categories.find(c => c.name === "Dining Out");
+  const currentDining = diningCategory ? currentMonthTransactions.filter(t => t.categoryId === diningCategory.id && t.type === "expense").reduce((s, t) => s + t.amount, 0) : 0;
+  const lastDining = diningCategory ? lastMonthTransactions.filter(t => t.categoryId === diningCategory.id && t.type === "expense").reduce((s, t) => s + t.amount, 0) : 0;
+  const diningChange = lastDining > 0 ? ((currentDining - lastDining) / lastDining) * 100 : null;
+
+  const groceriesCategory = categories.find(c => c.name === "Groceries");
+  const currentGroceries = groceriesCategory ? currentMonthTransactions.filter(t => t.categoryId === groceriesCategory.id && t.type === "expense").reduce((s, t) => s + t.amount, 0) : 0;
+  const budgetGroceries = budgets.find(b => b.categoryId === groceriesCategory?.id);
+  const groceriesUnderBudget = budgetGroceries && currentGroceries < budgetGroceries.amount;
+
+  const hasData = transactions.length > 0 || accounts.length > 0;
+  const hasTransactions = transactions.length > 0;
+  const hasAccounts = accounts.length > 0;
+
+  const financialScores = React.useMemo(() => {
+    const savings = currentMonthIncome > 0 ? Math.min(((currentMonthIncome - currentMonthExpenses) / currentMonthIncome) * 100, 100) : 0;
+    const budgetScore = budgets.length > 0
+      ? Math.min(budgets.reduce((s, b) => s + Math.max(0, 100 - (b.spent / b.amount) * 100), 0) / budgets.length, 100)
+      : 0;
+    const emergency = totalBalance > 0 ? Math.min((totalBalance / (currentMonthExpenses || 1)) * (100 / 3), 100) : 0;
+    const consistency = hasTransactions ? Math.min((transactions.length / 20) * 100, 100) : 0;
+    return {
+      savings: Math.round(savings),
+      budget: Math.round(budgetScore),
+      emergency: Math.round(emergency),
+      consistency: Math.round(consistency),
+      overall: Math.round((savings + budgetScore + emergency + consistency) / 4),
+    };
+  }, [currentMonthIncome, currentMonthExpenses, budgets, totalBalance, transactions.length, hasTransactions]);
+
+  const getHealthLabel = (score: number) => {
+    if (score >= 80) return "Excellent";
+    if (score >= 60) return "Good";
+    if (score >= 40) return "Fair";
+    if (score >= 20) return "Needs Improvement";
+    return "Just Starting";
+  };
 
   if (!isLoggedIn) {
     return (
@@ -144,9 +221,15 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div className="flex items-center mt-3 text-sm">
-                  <ArrowUpRight className="h-4 w-4 text-success mr-1" />
-                  <span className="text-success">{totalIncome > 0 ? `+${formatPercentage(((totalIncome - totalExpenses) / totalIncome) * 100)}` : 'N/A'}</span>
-                  <span className="text-foreground-tertiary ml-1">savings rate</span>
+                  {savingsRateChange !== null ? (
+                    <>
+                      <ArrowUpRight className={`h-4 w-4 mr-1 ${savingsRateChange >= 0 ? 'text-success' : 'text-error'}`} />
+                      <span className={savingsRateChange >= 0 ? 'text-success' : 'text-error'}>{savingsRateChange >= 0 ? '+' : ''}{formatPercentage(savingsRateChange)}</span>
+                      <span className="text-foreground-tertiary ml-1">savings rate</span>
+                    </>
+                  ) : (
+                    <span className="text-foreground-tertiary">No data yet</span>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -167,32 +250,15 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div className="flex items-center mt-3 text-sm">
-                  <ArrowUpRight className="h-4 w-4 text-success mr-1" />
-                  <span className="text-success">+{formatPercentage(5)}</span>
-                  <span className="text-foreground-tertiary ml-1">vs last month</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Expenses */}
-            <Card variant="glass" className="relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-error/20 to-warning/20 rounded-full -translate-y-8 translate-x-8" />
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-foreground-secondary">Expenses</p>
-                    <p className="text-xl lg:text-2xl font-bold text-error mt-1 font-mono">
-                      {formatCurrency(totalExpenses)}
-                    </p>
-                  </div>
-                  <div className="w-10 h-10 rounded-full bg-error/20 flex items-center justify-center">
-                    <ArrowDownRight className="h-5 w-5 text-error" />
-                  </div>
-                </div>
-                <div className="flex items-center mt-3 text-sm">
-                  <ArrowDownRight className="h-4 w-4 text-success mr-1" />
-                  <span className="text-success">-{formatPercentage(3)}</span>
-                  <span className="text-foreground-tertiary ml-1">vs last month</span>
+                  {expenseChange !== null ? (
+                    <>
+                      <ArrowDownRight className={`h-4 w-4 mr-1 ${expenseChange <= 0 ? 'text-success' : 'text-error'}`} />
+                      <span className={expenseChange <= 0 ? 'text-success' : 'text-error'}>{expenseChange <= 0 ? '' : '+'}{formatPercentage(expenseChange)}</span>
+                      <span className="text-foreground-tertiary ml-1">vs last month</span>
+                    </>
+                  ) : (
+                    <span className="text-foreground-tertiary">No data yet</span>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -204,11 +270,11 @@ export default function DashboardPage() {
                   <div>
                     <p className="text-sm text-foreground-secondary">Savings Rate</p>
                     <p className="text-xl lg:text-2xl font-bold text-accent-cyan mt-1 font-mono">
-                      {formatPercentage(savingsRate)}
+                      {formatPercentage(currentSavingsRate)}
                     </p>
                   </div>
-                  <ProgressRing value={savingsRate} max={100} size={50} strokeWidth={5}>
-                    <span className="text-xs font-bold text-foreground">{Math.round(savingsRate)}%</span>
+                  <ProgressRing value={currentSavingsRate} max={100} size={50} strokeWidth={5}>
+                    <span className="text-xs font-bold text-foreground">{Math.round(currentSavingsRate)}%</span>
                   </ProgressRing>
                 </div>
                 <p className="text-sm text-foreground-tertiary mt-3">
@@ -385,7 +451,7 @@ export default function DashboardPage() {
           </Card>
 
           {/* AI Insights */}
-          {showAiInsight && (
+          {showAiInsight && hasTransactions && (
           <Card variant="elevated" className="bg-gradient-to-r from-primary-start/10 to-primary-end/10 border-primary-start/20">
             <CardContent className="p-6">
               <div className="flex items-start space-x-4">
@@ -395,8 +461,16 @@ export default function DashboardPage() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-foreground">AI Insight</h3>
                   <p className="text-foreground-secondary mt-1">
-                    Your dining spending is 23% higher than last month. 
-                    Consider adjusting your budget or tracking expenses more closely.
+                    {diningChange !== null && diningChange > 0
+                      ? `Your dining spending is ${diningChange.toFixed(0)}% higher than last month. Consider adjusting your budget or tracking expenses more closely.`
+                      : diningChange !== null && diningChange < 0
+                      ? `Great job! Your dining spending is ${Math.abs(diningChange).toFixed(0)}% lower than last month. Keep it up!`
+                      : groceriesUnderBudget
+                      ? `Your grocery spending is under budget. You're on track this month!`
+                      : hasTransactions
+                      ? `You have ${transactions.length} transaction${transactions.length > 1 ? 's' : ''} recorded. Keep tracking to get personalized insights!`
+                      : `Start adding transactions to get AI-powered insights about your spending habits.`
+                    }
                   </p>
                   <div className="flex gap-3 mt-4">
                     <Button size="sm" onClick={() => router.push("/budgets")}>Adjust Budget</Button>
@@ -406,6 +480,102 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
+          )}
+
+          {/* Financial Health Score */}
+          {hasTransactions && (
+          <Card variant="glass">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">Financial Health Score</CardTitle>
+              <p className="text-sm text-foreground-tertiary mt-1">
+                Your overall financial health is {getHealthLabel(financialScores.overall)}. {financialScores.overall >= 60 ? 'Keep making smart decisions!' : 'Start building better habits today.'}
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                {[
+                  { label: "Savings", score: financialScores.savings },
+                  { label: "Budget", score: financialScores.budget },
+                  { label: "Emergency", score: financialScores.emergency },
+                  { label: "Consistency", score: financialScores.consistency },
+                  { label: "Overall", score: financialScores.overall },
+                ].map((item) => (
+                  <div key={item.label} className="flex flex-col items-center gap-2">
+                    <ProgressRing value={item.score} max={100} size={60} strokeWidth={6}>
+                      <span className="text-xs font-bold text-foreground">{item.score}</span>
+                    </ProgressRing>
+                    <span className="text-xs text-foreground-secondary">{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          )}
+
+          {/* Spending Trend Insight */}
+          {hasTransactions && vsAvgChange !== null && (
+          <div className="grid lg:grid-cols-2 gap-6">
+            <Card variant="glass">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">Spending Overview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 rounded-xl bg-white/5">
+                  <div>
+                    <p className="text-sm text-foreground-secondary">This Month</p>
+                    <p className="text-xl font-bold font-mono text-foreground">{formatCurrency(currentMonthExpenses)}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-foreground-secondary">vs 6-Month Avg</p>
+                    <p className={`text-lg font-mono font-semibold ${vsAvgChange <= 0 ? 'text-success' : 'text-error'}`}>
+                      {vsAvgChange <= 0 ? '' : '+'}{formatPercentage(vsAvgChange)}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-foreground-secondary mt-3">
+                  {vsAvgChange <= 0
+                    ? `Your spending is ${Math.abs(vsAvgChange).toFixed(0)}% lower than the 6-month average. Great job staying on track!`
+                    : `Your spending is ${vsAvgChange.toFixed(0)}% higher than the 6-month average. Consider reviewing your expenses.`
+                  }
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card variant="glass">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">Category Insights</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {diningChange !== null && diningChange > 0 && (
+                  <div className="p-4 rounded-xl bg-error/5 border border-error/10 mb-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-foreground">🍕 Dining Out</span>
+                      <span className="text-sm font-mono text-error">+{formatPercentage(diningChange)}</span>
+                    </div>
+                    <p className="text-xs text-foreground-secondary mt-1">
+                      Your dining out expenses are {diningChange.toFixed(0)}% higher than last month.
+                    </p>
+                  </div>
+                )}
+                {groceriesUnderBudget && (
+                  <div className="p-4 rounded-xl bg-success/5 border border-success/10">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-foreground">🛒 Groceries</span>
+                      <span className="text-xs font-mono text-success">Under Budget</span>
+                    </div>
+                    <p className="text-xs text-foreground-secondary mt-1">
+                      Grocery spending is within budget limits.
+                    </p>
+                  </div>
+                )}
+                {diningChange === null && !groceriesUnderBudget && (
+                  <p className="text-sm text-foreground-secondary text-center py-4">
+                    Add more transactions to see category insights.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
           )}
         </main>
       </div>

@@ -194,9 +194,9 @@ export default function AnalyticsPage() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-foreground-secondary">Total Spent</p>
+                        <p className="text-sm text-foreground-secondary">Daily Average</p>
                         <p className="text-2xl font-bold font-mono text-foreground mt-1">
-                          {formatCurrency(totalSpending)}
+                          {formatCurrency(totalSpending / new Date().getDate())}
                         </p>
                       </div>
                       <div className="w-10 h-10 rounded-full bg-error/20 flex items-center justify-center">
@@ -204,9 +204,19 @@ export default function AnalyticsPage() {
                       </div>
                     </div>
                     <div className="flex items-center mt-3 text-sm">
-                      <TrendingDown className="h-4 w-4 text-success mr-1" />
-                      <span className="text-success">-8%</span>
-                      <span className="text-foreground-tertiary ml-1">vs last month</span>
+                      {(() => {
+                        const currentMonthExp = monthlyData[monthlyData.length - 1]?.expenses || 0;
+                        const prevMonthExp = monthlyData[monthlyData.length - 2]?.expenses || 0;
+                        const change = prevMonthExp > 0 ? ((currentMonthExp - prevMonthExp) / prevMonthExp) * 100 : null;
+                        if (change === null) return <span className="text-foreground-tertiary">No data yet</span>;
+                        return (
+                          <>
+                            <TrendingDown className={`h-4 w-4 mr-1 ${change <= 0 ? 'text-success' : 'text-error'}`} />
+                            <span className={change <= 0 ? 'text-success' : 'text-error'}>{change <= 0 ? '' : '+'}{change.toFixed(0)}%</span>
+                            <span className="text-foreground-tertiary ml-1">vs last month</span>
+                          </>
+                        );
+                      })()}
                     </div>
                   </CardContent>
                 </Card>
@@ -217,7 +227,7 @@ export default function AnalyticsPage() {
                       <div>
                         <p className="text-sm text-foreground-secondary">Daily Average</p>
                         <p className="text-2xl font-bold font-mono text-foreground mt-1">
-                          {formatCurrency(totalSpending / 15)}
+                          {formatCurrency(totalSpending / new Date().getDate())}
                         </p>
                       </div>
                       <div className="w-10 h-10 rounded-full bg-warning/20 flex items-center justify-center">
@@ -357,7 +367,15 @@ export default function AnalyticsPage() {
                       })}
                     </div>
                     <p className="text-center text-sm text-foreground-secondary mt-4">
-                      Your spending is 8% lower than the 6-month average
+                      {(() => {
+                        const currentMonthExp = monthlyData[monthlyData.length - 1]?.expenses || 0;
+                        const avg = monthlyData.length > 0 ? monthlyData.reduce((s, d) => s + d.expenses, 0) / monthlyData.length : 0;
+                        if (avg === 0) return "Add transactions to see your spending trend";
+                        const change = ((currentMonthExp - avg) / avg) * 100;
+                        return change <= 0
+                          ? `Your spending is ${Math.abs(change).toFixed(0)}% lower than the 6-month average`
+                          : `Your spending is ${change.toFixed(0)}% higher than the 6-month average`;
+                      })()}
                     </p>
                   </CardContent>
                 </Card>
@@ -405,9 +423,19 @@ export default function AnalyticsPage() {
                       {formatCurrency(totalIncome)}
                     </p>
                     <div className="flex items-center mt-3 text-sm">
-                      <TrendingUp className="h-4 w-4 text-success mr-1" />
-                      <span className="text-success">+5%</span>
-                      <span className="text-foreground-tertiary ml-1">vs last month</span>
+                      {(() => {
+                        const currentMonthExp = monthlyData[monthlyData.length - 1]?.expenses || 0;
+                        const prevMonthExp = monthlyData[monthlyData.length - 2]?.expenses || 0;
+                        const change = prevMonthExp > 0 ? ((currentMonthExp - prevMonthExp) / prevMonthExp) * 100 : null;
+                        if (change === null) return <span className="text-foreground-tertiary">No data yet</span>;
+                        return (
+                          <>
+                            <TrendingDown className={`h-4 w-4 mr-1 ${change <= 0 ? 'text-success' : 'text-error'}`} />
+                            <span className={change <= 0 ? 'text-success' : 'text-error'}>{change <= 0 ? '' : '+'}{change.toFixed(0)}%</span>
+                            <span className="text-foreground-tertiary ml-1">vs last month</span>
+                          </>
+                        );
+                      })()}
                     </div>
                   </CardContent>
                 </Card>
@@ -480,9 +508,19 @@ export default function AnalyticsPage() {
                       {formatCurrency(netWorth)}
                     </p>
                     <div className="flex items-center mt-3 text-sm">
-                      <TrendingUp className="h-4 w-4 text-success mr-1" />
-                      <span className="text-success">+2.3%</span>
-                      <span className="text-foreground-tertiary ml-1">this month</span>
+                      {(() => {
+                        const currentIncome = monthlyData[monthlyData.length - 1]?.income || 0;
+                        const prevIncome = monthlyData[monthlyData.length - 2]?.income || 0;
+                        const change = prevIncome > 0 ? ((currentIncome - prevIncome) / prevIncome) * 100 : null;
+                        if (change === null) return <span className="text-foreground-tertiary">No data yet</span>;
+                        return (
+                          <>
+                            <TrendingUp className={`h-4 w-4 mr-1 ${change >= 0 ? 'text-success' : 'text-error'}`} />
+                            <span className={change >= 0 ? 'text-success' : 'text-error'}>{change >= 0 ? '+' : ''}{change.toFixed(0)}%</span>
+                            <span className="text-foreground-tertiary ml-1">vs last month</span>
+                          </>
+                        );
+                      })()}
                     </div>
                   </CardContent>
                 </Card>
@@ -490,8 +528,8 @@ export default function AnalyticsPage() {
                 <Card variant="glass">
                   <CardContent className="p-6">
                     <p className="text-sm text-foreground-secondary">Change</p>
-                    <p className="text-2xl font-bold font-mono text-success mt-1">
-                      +{formatCurrency(280)}
+                    <p className={`text-2xl font-bold font-mono mt-1 ${netWorth >= 0 ? 'text-success' : 'text-error'}`}>
+                      {netWorth >= 0 ? '+' : ''}{formatCurrency(netWorth)}
                     </p>
                   </CardContent>
                 </Card>
@@ -502,40 +540,48 @@ export default function AnalyticsPage() {
                   <CardTitle className="text-lg font-semibold">Net Worth History</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-64 flex items-end justify-between gap-3">
-                    {(() => {
-                      const months = [];
-                      for (let i = 5; i >= 0; i--) {
-                        const d = new Date();
-                        d.setMonth(d.getMonth() - i);
-                        months.push(d.toLocaleDateString('en-US', { month: 'short' }));
-                      }
-                      return months;
-                    })().map((month, i) => {
-                      const values = [10000, 10500, 10800, 11200, 11800, 12458];
-                      const maxValue = 15000;
-                      const height = (values[i] / maxValue) * 100;
-                      const isCurrentMonth = month === currentMonthStr;
-                      
-                      return (
-                        <div key={month} className="flex-1 flex flex-col items-center gap-2">
-                          <div 
-                            className={cn(
-                              "w-full rounded-t-lg transition-all",
-                              isCurrentMonth ? "gradient-primary" : "bg-white/20"
-                            )}
-                            style={{ height: `${height}%` }}
-                          />
-                          <span className={cn(
-                            "text-xs",
-                            isCurrentMonth ? "text-primary-start font-medium" : "text-foreground-tertiary"
-                          )}>
-                            {month}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
+                  {accounts.length > 0 ? (
+                    <div className="h-64 flex items-end justify-between gap-3">
+                      {(() => {
+                        const months = [];
+                        for (let i = 5; i >= 0; i--) {
+                          const d = new Date();
+                          d.setMonth(d.getMonth() - i);
+                          months.push(d.toLocaleDateString('en-US', { month: 'short' }));
+                        }
+                        return months;
+                      })().map((month, i) => {
+                        const netWorthValues = monthlyData.map(d => d.income - d.expenses);
+                        const currentValue = netWorthValues[netWorthValues.length - 1] || netWorth;
+                        const values = netWorthValues.map((v, idx) => v || (currentValue * (0.85 + idx * 0.03)));
+                        const maxValue = Math.max(...values.map(Math.abs), 1);
+                        const height = Math.abs(values[i] || 0) / maxValue * 100;
+                        const isCurrentMonth = month === currentMonthStr;
+                        
+                        return (
+                          <div key={month} className="flex-1 flex flex-col items-center gap-2">
+                            <div 
+                              className={cn(
+                                "w-full rounded-t-lg transition-all",
+                                isCurrentMonth ? "gradient-primary" : "bg-white/20"
+                              )}
+                              style={{ height: `${Math.max(height, 5)}%` }}
+                            />
+                            <span className={cn(
+                              "text-xs",
+                              isCurrentMonth ? "text-primary-start font-medium" : "text-foreground-tertiary"
+                            )}>
+                              {month}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="h-64 flex items-center justify-center">
+                      <p className="text-foreground-secondary text-sm">Add accounts to see net worth history</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
