@@ -105,16 +105,21 @@ export default function DashboardPage() {
     const budgetScore = budgets.length > 0
       ? Math.min(budgets.reduce((s, b) => s + Math.max(0, 100 - (b.spent / b.amount) * 100), 0) / budgets.length, 100)
       : 0;
+    const creditAccounts = accounts.filter(a => a.type === "credit_card" || a.type === "loan" || a.type === "mortgage");
+    const debtScore = creditAccounts.length > 0
+      ? Math.max(0, 100 - (creditAccounts.reduce((s, a) => s + Number(a.balance), 0) / (totalBalance || 1)) * 100)
+      : 100;
     const emergency = totalBalance > 0 ? Math.min((totalBalance / (currentMonthExpenses || 1)) * (100 / 3), 100) : 0;
     const consistency = hasTransactions ? Math.min((transactions.length / 20) * 100, 100) : 0;
     return {
       savings: Math.round(savings),
       budget: Math.round(budgetScore),
+      debt: Math.round(debtScore),
       emergency: Math.round(emergency),
       consistency: Math.round(consistency),
-      overall: Math.round((savings + budgetScore + emergency + consistency) / 4),
+      overall: Math.round((savings + budgetScore + debtScore + emergency + consistency) / 5),
     };
-  }, [currentMonthIncome, currentMonthExpenses, budgets, totalBalance, transactions.length, hasTransactions]);
+  }, [currentMonthIncome, currentMonthExpenses, budgets, totalBalance, transactions.length, hasTransactions, accounts]);
 
   const getHealthLabel = (score: number) => {
     if (score >= 80) return "Excellent";
@@ -485,28 +490,44 @@ export default function DashboardPage() {
           {/* Financial Health Score */}
           {hasTransactions && (
           <Card variant="glass">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">Financial Health Score</CardTitle>
-              <p className="text-sm text-foreground-tertiary mt-1">
-                Your overall financial health is {getHealthLabel(financialScores.overall)}. {financialScores.overall >= 60 ? 'Keep making smart decisions!' : 'Start building better habits today.'}
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                {[
-                  { label: "Savings", score: financialScores.savings },
-                  { label: "Budget", score: financialScores.budget },
-                  { label: "Emergency", score: financialScores.emergency },
-                  { label: "Consistency", score: financialScores.consistency },
-                  { label: "Overall", score: financialScores.overall },
-                ].map((item) => (
-                  <div key={item.label} className="flex flex-col items-center gap-2">
-                    <ProgressRing value={item.score} max={100} size={60} strokeWidth={6}>
-                      <span className="text-xs font-bold text-foreground">{item.score}</span>
-                    </ProgressRing>
-                    <span className="text-xs text-foreground-secondary">{item.label}</span>
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row md:items-center gap-6">
+                {/* Large Overall Score Ring */}
+                <div className="flex-shrink-0">
+                  <ProgressRing value={financialScores.overall} max={100} size={100} strokeWidth={8}>
+                    <div className="text-center">
+                      <span className="text-2xl font-bold text-foreground">{financialScores.overall}</span>
+                      <span className="text-xs text-foreground-tertiary">/100</span>
+                    </div>
+                  </ProgressRing>
+                </div>
+
+                {/* Score Details */}
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <svg className="h-5 w-5 text-primary-start" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/><path d="M5 19l1.5-1.5L8 19l-1.5 1.5z"/><path d="M17 19l1.5-1.5L20 19l-1.5 1.5z"/></svg>
+                    <h3 className="text-lg font-semibold text-foreground">Financial Health Score</h3>
                   </div>
-                ))}
+                  <p className="text-sm text-foreground-secondary mb-4">
+                    Your overall financial health is <span className={financialScores.overall >= 60 ? 'text-success font-medium' : 'text-warning font-medium'}>{getHealthLabel(financialScores.overall)}</span>. {financialScores.overall >= 60 ? 'Keep making smart decisions!' : 'Start building better habits today.'}
+                  </p>
+
+                  {/* Horizontal Progress Bars */}
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    {[
+                      { label: "Savings", score: financialScores.savings },
+                      { label: "Budget", score: financialScores.budget },
+                      { label: "Debt", score: financialScores.debt },
+                      { label: "Emergency", score: financialScores.emergency },
+                      { label: "Consistency", score: financialScores.consistency },
+                    ].map((item) => (
+                      <div key={item.label} className="flex flex-col items-center gap-1">
+                        <Progress value={item.score} max={100} variant={item.score >= 60 ? "default" : item.score >= 30 ? "warning" : "danger"} />
+                        <span className="text-xs text-foreground-secondary">{item.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
