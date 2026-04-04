@@ -180,8 +180,8 @@ export default function SettingsPage() {
                   {user?.name?.charAt(0) || "A"}
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-xl font-semibold text-foreground">{user?.name || "Alex Chen"}</h2>
-                  <p className="text-foreground-secondary">{user?.email || "alex@example.com"}</p>
+                  <h2 className="text-xl font-semibold text-foreground">{user?.name || "User"}</h2>
+                  <p className="text-foreground-secondary">{user?.email || "Not set"}</p>
                   <div className="flex items-center gap-2 mt-2">
                     {isPremium ? (
                       <Badge variant="success">Premium Plan</Badge>

@@ -4,20 +4,17 @@ import * as React from "react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { Header } from "@/components/layout/header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { 
   Bell, 
-  TrendingUp, 
-  TrendingDown, 
   Target, 
   AlertTriangle, 
   CheckCircle,
   Info,
   Calendar,
   Trash2,
-  Filter,
   Check
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -31,18 +28,10 @@ interface Notification {
   createdAt: string;
 }
 
-const sampleNotifications: Notification[] = [
-  { id: "1", type: "budget_alert" as const, title: "Budget Alert", message: "Dining Out is at 75% of your monthly budget", isRead: false, createdAt: "2 hours ago" },
-  { id: "2", type: "goal_milestone" as const, title: "Goal Milestone", message: "Emergency Fund reached 50% of target", isRead: false, createdAt: "Yesterday" },
-  { id: "3", type: "insight" as const, title: "AI Insight", message: "Your grocery spending is 15% lower than last month. Great job!", isRead: true, createdAt: "2 days ago" },
-  { id: "4", type: "bill_reminder" as const, title: "Bill Reminder", message: "Internet bill of Rf 450 is due in 3 days", isRead: true, createdAt: "3 days ago" },
-  { id: "5", type: "system" as const, title: "Welcome", message: "Welcome to FinanceFlow! Start tracking your finances today.", isRead: true, createdAt: "1 week ago" },
-];
-
 export default function NotificationsPage() {
   const router = useRouter();
   const [filter, setFilter] = React.useState<"all" | "unread">("all");
-  const [notifications, setNotifications] = React.useState<Notification[]>(sampleNotifications);
+  const [notifications, setNotifications] = React.useState<Notification[]>([]);
 
   const filteredNotifications = filter === "unread" 
     ? notifications.filter(n => !n.isRead)
@@ -85,14 +74,13 @@ export default function NotificationsPage() {
         <Header title="Notifications" showSearch={false} showNotifications={false} />
         
         <main className="p-4 lg:p-6 pb-20 lg:pb-6 space-y-6">
-          {/* Header Actions */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
                 Notifications
               </h1>
               <p className="text-foreground-secondary mt-1">
-                {unreadCount} unread notification{unreadCount !== 1 ? "s" : ""}
+                {unreadCount > 0 ? `${unreadCount} unread notification${unreadCount !== 1 ? "s" : ""}` : "No notifications yet"}
               </p>
             </div>
             <div className="flex gap-2">
@@ -105,7 +93,6 @@ export default function NotificationsPage() {
             </div>
           </div>
 
-          {/* Filter Tabs */}
           <div className="flex gap-2">
             {(["all", "unread"] as const).map((f) => (
               <button
@@ -118,15 +105,11 @@ export default function NotificationsPage() {
                     : "glass text-foreground-secondary hover:text-foreground"
                 )}
               >
-                {f === "unread" && !notifications.some(n => n.isRead) && (
-                  <span className="w-2 h-2 bg-error rounded-full inline-block mr-2" />
-                )}
                 {f}
               </button>
             ))}
           </div>
 
-          {/* Notifications List */}
           <div className="space-y-3">
             {filteredNotifications.length === 0 ? (
               <Card variant="glass" className="p-12 text-center">
@@ -135,7 +118,7 @@ export default function NotificationsPage() {
                 </div>
                 <h3 className="text-lg font-semibold text-foreground mb-2">No notifications</h3>
                 <p className="text-foreground-secondary">
-                  {filter === "unread" ? "All caught up! No unread notifications." : "You're all caught up!"}
+                  {filter === "unread" ? "All caught up! No unread notifications." : "You'll see notifications here once you start tracking your finances."}
                 </p>
               </Card>
             ) : (
@@ -191,7 +174,6 @@ export default function NotificationsPage() {
             )}
           </div>
 
-          {/* Notification Settings Link */}
           <Card variant="glass" className="!p-0">
             <button
               className="w-full flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-colors text-left"

@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 
 export default function ProfilePage() {
-  const { user, transactions, accounts, goals, setUser, isPremium, logout } = useAppStore();
+  const { user, transactions, accounts, goals, setUser, isPremium, logout, currency } = useAppStore();
   const router = useRouter();
   const [showEditModal, setShowEditModal] = React.useState(false);
   const [editName, setEditName] = React.useState(user?.name || "");
@@ -85,8 +85,8 @@ export default function ProfilePage() {
                 </div>
                 
                 <div className="flex-1 text-center md:text-left">
-                  <h1 className="text-2xl font-bold text-foreground">{user?.name || "Alex Chen"}</h1>
-                  <p className="text-foreground-secondary">{user?.email || "alex@example.com"}</p>
+                  <h1 className="text-2xl font-bold text-foreground">{user?.name || "User"}</h1>
+                  <p className="text-foreground-secondary">{user?.email || "Not set"}</p>
                   <div className="flex items-center justify-center md:justify-start gap-2 mt-2">
                     {isPremium ? (
                       <Badge variant="success">Premium Plan</Badge>
@@ -188,7 +188,7 @@ export default function ProfilePage() {
                   </div>
                   <div>
                     <p className="text-sm text-foreground-tertiary">Email</p>
-                    <p className="text-foreground">{user?.email || "alex@example.com"}</p>
+                    <p className="text-foreground">{user?.email || "Not set"}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-white/5">
@@ -197,7 +197,7 @@ export default function ProfilePage() {
                   </div>
                   <div>
                     <p className="text-sm text-foreground-tertiary">Member Since</p>
-                    <p className="text-foreground">January 2024</p>
+                    <p className="text-foreground">{user ? new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : "Not set"}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-white/5">
@@ -206,7 +206,7 @@ export default function ProfilePage() {
                   </div>
                   <div>
                     <p className="text-sm text-foreground-tertiary">Location</p>
-                    <p className="text-foreground">Male&apos;, Maldives</p>
+                    <p className="text-foreground">Not set</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-white/5">
@@ -215,7 +215,7 @@ export default function ProfilePage() {
                   </div>
                   <div>
                     <p className="text-sm text-foreground-tertiary">Currency</p>
-                    <p className="text-foreground">MVR (Rf)</p>
+                    <p className="text-foreground">{currency}</p>
                   </div>
                 </div>
               </div>
