@@ -7,7 +7,154 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ── Enums ──────────────────────────────────────────────────────────────
+model User {
+  id                  String         @id @default(cuid())
+  email               String         @unique @db.VarChar(255)
+  name                String?        @db.VarChar(100)
+  password            String?        @db.VarChar(255)
+  isPremium           Boolean        @default(false)
+  isAdmin             Boolean        @default(false)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  passwordResetExpiry DateTime?
+  passwordResetToken  String?        @db.VarChar(255)
+  accounts            Account[]
+  budgets             Budget[]
+  categories          Category[]
+  goals               Goal[]
+  notifications       Notification[]
+  transactions        Transaction[]
+
+  @@index([email])
+}
+
+model Account {
+  id           String        @id @default(cuid())
+  userId       String
+  name         String        @db.VarChar(100)
+  balance      Decimal       @default(0) @db.Decimal(15, 2)
+  currency     String        @default("MVR") @db.VarChar(3)
+  color        String?       @db.VarChar(7)
+  icon         String?       @db.VarChar(50)
+  isActive     Boolean       @default(true)
+  institution  String?       @db.VarChar(100)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  type         AccountType
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@index([userId])
+  @@index([userId, isActive])
+}
+
+model Transaction {
+  id           String          @id @default(cuid())
+  userId       String
+  accountId    String?
+  categoryId   String?
+  amount       Decimal         @db.Decimal(15, 2)
+  currency     String          @default("MVR") @db.VarChar(3)
+  description  String?         @db.VarChar(255)
+  merchantName String?         @db.VarChar(150)
+  note         String?
+  isRecurring  Boolean         @default(false)
+  isExcluded   Boolean         @default(false)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  type         TransactionType
+  date         DateTime
+  tags         Json            @default("[]")
+  account      Account?        @relation(fields: [accountId], references: [id])
+  category     Category?       @relation(fields: [categoryId], references: [id])
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, type])
+  @@index([userId, date])
+  @@index([userId, categoryId])
+  @@index([userId, accountId])
+}
+
+model Category {
+  id           String          @id @default(cuid())
+  userId       String
+  name         String          @db.VarChar(50)
+  icon         String?         @db.VarChar(50)
+  color        String?         @db.VarChar(7)
+  isSystem     Boolean         @default(false)
+  sortOrder    Int             @default(0)
+  isActive     Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+  type         TransactionType
+  budgets      Budget[]
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@unique([userId, name, type])
+  @@index([userId])
+  @@index([userId, type, isActive])
+}
+
+model Budget {
+  id             String       @id @default(cuid())
+  userId         String
+  categoryId     String?
+  name           String       @db.VarChar(100)
+  amount         Decimal      @db.Decimal(15, 2)
+  rollover       Boolean      @default(false)
+  alertThreshold Int          @default(75)
+  isActive       Boolean      @default(true)
+  spent          Decimal      @default(0) @db.Decimal(15, 2)
+  remaining      Decimal      @default(0) @db.Decimal(15, 2)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  period         BudgetPeriod @default(monthly)
+  startDate      DateTime?
+  category       Category?    @relation(fields: [categoryId], references: [id])
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, isActive])
+  @@index([userId, categoryId])
+}
+
+model Goal {
+  id                  String     @id @default(cuid())
+  userId              String
+  name                String     @db.VarChar(100)
+  targetAmount        Decimal    @db.Decimal(15, 2)
+  currentAmount       Decimal    @default(0) @db.Decimal(15, 2)
+  icon                String?    @db.VarChar(50)
+  color               String?    @db.VarChar(7)
+  monthlyContribution Decimal    @default(0) @db.Decimal(15, 2)
+  completedAt         DateTime?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  type                GoalType
+  targetDate          DateTime
+  status              GoalStatus @default(active)
+  user                User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, status])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String           @db.VarChar(100)
+  message   String           @db.VarChar(500)
+  data      Json?
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, isRead])
+  @@index([userId, createdAt(sort: Desc)])
+}
 
 enum AccountType {
   checking
@@ -58,158 +205,4 @@ enum NotificationType {
   anomaly
   insight
   system
-}
-
-// ── Models ─────────────────────────────────────────────────────────────
-
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique @db.VarChar(255)
-  name      String?  @db.VarChar(100)
-  password  String?  @db.VarChar(255)
-  isPremium Boolean  @default(false)
-  isAdmin   Boolean  @default(false)
-  passwordResetToken String? @db.VarChar(255)
-  passwordResetExpiry DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  accounts      Account[]
-  transactions  Transaction[]
-  budgets       Budget[]
-  goals         Goal[]
-  categories    Category[]
-  notifications Notification[]
-
-  @@index([email])
-}
-
-model Account {
-  id          String      @id @default(cuid())
-  userId      String
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name        String      @db.VarChar(100)
-  type        AccountType
-  balance     Decimal     @default(0) @db.Decimal(15, 2)
-  currency    String      @default("MVR") @db.VarChar(3)
-  color       String?     @db.VarChar(7)
-  icon        String?     @db.VarChar(50)
-  isActive    Boolean     @default(true)
-  institution String?     @db.VarChar(100)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-
-  transactions Transaction[]
-
-  @@index([userId])
-  @@index([userId, isActive])
-}
-
-model Transaction {
-  id            String         @id @default(cuid())
-  userId        String
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accountId     String?
-  account       Account?       @relation(fields: [accountId], references: [id], onDelete: SetNull)
-  categoryId    String?
-  category      Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  type          TransactionType
-  amount        Decimal        @db.Decimal(15, 2)
-  currency      String         @default("MVR") @db.VarChar(3)
-  description   String?        @db.VarChar(255)
-  merchantName  String?        @db.VarChar(150)
-  date          DateTime
-  note          String?        @db.Text
-  isRecurring   Boolean        @default(false)
-  isExcluded    Boolean        @default(false)
-  tags          Json           @default("[]")
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-
-  @@index([userId])
-  @@index([userId, type])
-  @@index([userId, date])
-  @@index([userId, categoryId])
-  @@index([userId, accountId])
-}
-
-model Category {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name      String   @db.VarChar(50)
-  icon      String?  @db.VarChar(50)
-  color     String?  @db.VarChar(7)
-  type      TransactionType
-  isSystem  Boolean  @default(false)
-  sortOrder Int      @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-
-  budgets      Budget[]
-  transactions Transaction[]
-
-  @@index([userId])
-  @@index([userId, type, isActive])
-  @@unique([userId, name, type])
-}
-
-model Budget {
-  id              String      @id @default(cuid())
-  userId          String
-  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  categoryId      String?
-  category        Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  name            String      @db.VarChar(100)
-  amount          Decimal     @db.Decimal(15, 2)
-  period          BudgetPeriod @default(monthly)
-  startDate       DateTime?
-  rollover        Boolean     @default(false)
-  alertThreshold  Int         @default(75)
-  isActive        Boolean     @default(true)
-  spent           Decimal     @default(0) @db.Decimal(15, 2)
-  remaining       Decimal     @default(0) @db.Decimal(15, 2)
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-
-  @@index([userId])
-  @@index([userId, isActive])
-  @@index([userId, categoryId])
-}
-
-model Goal {
-  id                  String     @id @default(cuid())
-  userId              String
-  user                User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name                String     @db.VarChar(100)
-  type                GoalType
-  targetAmount        Decimal    @db.Decimal(15, 2)
-  currentAmount       Decimal    @default(0) @db.Decimal(15, 2)
-  targetDate          DateTime
-  icon                String?    @db.VarChar(50)
-  color               String?    @db.VarChar(7)
-  status              GoalStatus @default(active)
-  monthlyContribution Decimal    @default(0) @db.Decimal(15, 2)
-  completedAt         DateTime?
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
-
-  @@index([userId])
-  @@index([userId, status])
-}
-
-model Notification {
-  id        String           @id @default(cuid())
-  userId    String
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type      NotificationType
-  title     String           @db.VarChar(100)
-  message   String           @db.VarChar(500)
-  data      Json?
-  isRead    Boolean          @default(false)
-  createdAt DateTime         @default(now())
-
-  @@index([userId])
-  @@index([userId, isRead])
-  @@index([userId, createdAt(sort: Desc)])
 }
