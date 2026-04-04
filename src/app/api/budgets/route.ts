@@ -27,7 +27,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, amount, period, categoryId, startDate, rollover, alertThreshold } = body
+    const { name, amount, period, categoryId, startDate, rollover, alertThreshold, userId } = body
 
     if (!name || !amount) {
       return NextResponse.json({ error: 'Name and amount are required' }, { status: 400 })
@@ -42,6 +42,7 @@ export async function POST(request: Request) {
         startDate: startDate ? new Date(startDate) : null,
         rollover: rollover || false,
         alertThreshold: alertThreshold || 75,
+        userId: userId || '1',
       },
       include: {
         category: { select: { id: true, name: true, icon: true, color: true } },

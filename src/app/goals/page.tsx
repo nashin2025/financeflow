@@ -7,6 +7,7 @@ import { Header } from "@/components/layout/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress, ProgressRing } from "@/components/ui/progress";
+import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { formatCurrency, cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
 import Link from "next/link";
@@ -41,7 +42,7 @@ export default function GoalsPage() {
               </div>
               <h1 className="text-2xl font-bold text-foreground mb-2">No Goals Yet</h1>
               <p className="text-foreground-secondary mb-6">Set financial goals to track your progress and stay motivated.</p>
-              <Button className="w-full">
+              <Button className="w-full" onClick={() => alert("Goal creation form coming soon")}>
                 <Plus className="h-4 w-4 mr-2" />
                 Create Your First Goal
               </Button>
@@ -119,7 +120,7 @@ export default function GoalsPage() {
                 Track your progress toward your dreams
               </p>
             </div>
-            <Button>
+            <Button onClick={() => alert("Goal creation form coming soon")}>
               <Plus className="h-4 w-4 mr-2" />
               New Goal
             </Button>
@@ -196,9 +197,17 @@ export default function GoalsPage() {
                           </p>
                         </div>
                       </div>
-                      <button className="p-2 rounded-lg hover:bg-white/10 transition-colors">
-                        <MoreHorizontal className="h-4 w-4 text-foreground-secondary" />
-                      </button>
+                      <DropdownMenu
+                        trigger={
+                          <button className="p-2 rounded-lg hover:bg-white/10 transition-colors">
+                            <MoreHorizontal className="h-4 w-4 text-foreground-secondary" />
+                          </button>
+                        }
+                        items={[
+                          { label: "Edit", onClick: () => alert("Edit goal - coming soon") },
+                          { label: "Delete", onClick: () => alert("Delete goal - coming soon"), variant: "destructive" as const },
+                        ]}
+                      />
                     </div>
                     
                     <div className="flex items-end justify-between mb-3">
@@ -243,10 +252,10 @@ export default function GoalsPage() {
                     )}
                     
                     <div className="mt-3 flex gap-2">
-                      <Button variant="secondary" size="sm" className="flex-1">
+                      <Button variant="secondary" size="sm" className="flex-1" onClick={() => alert("Add money to goal - coming soon")}>
                         Add Money
                       </Button>
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" onClick={() => alert("Goal details view - coming soon")}>
                         View Details
                       </Button>
                     </div>
@@ -255,7 +264,7 @@ export default function GoalsPage() {
               })}
 
               {/* Add Goal Button */}
-              <button className="w-full p-5 rounded-xl border-2 border-dashed border-white/10 hover:border-primary-start/50 hover:bg-primary-start/5 transition-all flex items-center justify-center gap-2 text-foreground-secondary hover:text-primary-start">
+              <button className="w-full p-5 rounded-xl border-2 border-dashed border-white/10 hover:border-primary-start/50 hover:bg-primary-start/5 transition-all flex items-center justify-center gap-2 text-foreground-secondary hover:text-primary-start" onClick={() => alert("Goal creation form coming soon")}>
                 <Plus className="h-5 w-5" />
                 <span className="font-medium">Create New Goal</span>
               </button>
@@ -323,7 +332,7 @@ export default function GoalsPage() {
                           </p>
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" onClick={() => alert("Contribute to goal - coming soon")}>
                         Contribute
                       </Button>
                     </div>

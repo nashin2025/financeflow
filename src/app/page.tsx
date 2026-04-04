@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { Header } from "@/components/layout/header";
@@ -22,6 +23,8 @@ import {
 import Link from "next/link";
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const [showAiInsight, setShowAiInsight] = React.useState(true);
   const { user, transactions, accounts, budgets, goals, categories } = useAppStore();
 
   const isLoggedIn = !!user;
@@ -382,6 +385,7 @@ export default function DashboardPage() {
           </Card>
 
           {/* AI Insights */}
+          {showAiInsight && (
           <Card variant="elevated" className="bg-gradient-to-r from-primary-start/10 to-primary-end/10 border-primary-start/20">
             <CardContent className="p-6">
               <div className="flex items-start space-x-4">
@@ -395,13 +399,14 @@ export default function DashboardPage() {
                     Consider adjusting your budget or tracking expenses more closely.
                   </p>
                   <div className="flex gap-3 mt-4">
-                    <Button size="sm">Adjust Budget</Button>
-                    <Button variant="ghost" size="sm">Dismiss</Button>
+                    <Button size="sm" onClick={() => router.push("/budgets")}>Adjust Budget</Button>
+                    <Button variant="ghost" size="sm" onClick={() => setShowAiInsight(false)}>Dismiss</Button>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
+          )}
         </main>
       </div>
 

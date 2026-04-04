@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState } from "react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { Header } from "@/components/layout/header";
@@ -25,6 +26,25 @@ import {
 
 export default function BudgetsPage() {
   const { budgets, categories, transactions } = useAppStore();
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  
+  const handleCreateFirstBudget = () => {
+    alert("Budget creation form coming soon");
+  };
+
+  const handleAddBudgetCategory = () => {
+    alert("Budget creation form coming soon");
+  };
+
+  const handleEditBudget = (budgetName: string) => {
+    alert(`Edit budget: ${budgetName}`);
+  };
+
+  const handleDeleteBudget = (budgetName: string) => {
+    if (confirm(`Are you sure you want to delete "${budgetName}"?`)) {
+      alert(`Budget "${budgetName}" deleted`);
+    }
+  };
   
   if (budgets.length === 0) {
     return (
@@ -41,7 +61,7 @@ export default function BudgetsPage() {
               </div>
               <h1 className="text-2xl font-bold text-foreground mb-2">No Budgets Yet</h1>
               <p className="text-foreground-secondary mb-6">Create budgets to track your spending and save money.</p>
-              <Button className="w-full">
+              <Button onClick={handleCreateFirstBudget}>
                 <Plus className="h-4 w-4 mr-2" />
                 Create Your First Budget
               </Button>
@@ -207,9 +227,36 @@ export default function BudgetsPage() {
                           </div>
                         </div>
                       </div>
-                      <button className="p-2 rounded-lg hover:bg-white/10 transition-colors">
-                        <MoreHorizontal className="h-4 w-4 text-foreground-secondary" />
-                      </button>
+                      <div className="relative">
+                        <button 
+                          className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                          onClick={() => setOpenMenuId(openMenuId === budget.id ? null : budget.id)}
+                        >
+                          <MoreHorizontal className="h-4 w-4 text-foreground-secondary" />
+                        </button>
+                        {openMenuId === budget.id && (
+                          <div className="absolute right-0 top-full z-10 mt-1 w-36 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 shadow-lg overflow-hidden">
+                            <button
+                              className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-white/10 transition-colors"
+                              onClick={() => {
+                                handleEditBudget(budget.name);
+                                setOpenMenuId(null);
+                              }}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              className="w-full px-4 py-2 text-left text-sm text-error hover:bg-white/10 transition-colors"
+                              onClick={() => {
+                                handleDeleteBudget(budget.name);
+                                setOpenMenuId(null);
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                     
                     <Progress 
@@ -240,7 +287,10 @@ export default function BudgetsPage() {
               })}
 
               {/* Add Budget Button */}
-              <button className="w-full p-4 rounded-xl border-2 border-dashed border-white/10 hover:border-primary-start/50 hover:bg-primary-start/5 transition-all flex items-center justify-center gap-2 text-foreground-secondary hover:text-primary-start">
+              <button 
+                className="w-full p-4 rounded-xl border-2 border-dashed border-white/10 hover:border-primary-start/50 hover:bg-primary-start/5 transition-all flex items-center justify-center gap-2 text-foreground-secondary hover:text-primary-start"
+                onClick={handleAddBudgetCategory}
+              >
                 <Plus className="h-4 w-4" />
                 <span>Add New Budget Category</span>
               </button>
@@ -254,29 +304,40 @@ export default function BudgetsPage() {
             </CardHeader>
             <CardContent>
               <div className="h-48 flex items-end justify-between gap-2">
-                {["Jun", "Jul", "Aug", "Sep", "Oct", "Nov"].map((month, i) => {
-                  const heights = [65, 80, 70, 90, 75, currentDay];
-                  const height = heights[i];
-                  const isCurrentMonth = month === "Nov";
-                  
-                  return (
-                    <div key={month} className="flex-1 flex flex-col items-center gap-2">
-                      <div 
-                        className={cn(
-                          "w-full rounded-t-lg transition-all",
-                          isCurrentMonth ? "gradient-primary" : "bg-white/20"
-                        )}
-                        style={{ height: `${Math.min(height * 2, 100)}%` }}
-                      />
-                      <span className={cn(
-                        "text-xs",
-                        isCurrentMonth ? "text-primary-start font-medium" : "text-foreground-tertiary"
-                      )}>
-                        {month}
-                      </span>
-                    </div>
-                  );
-                })}
+                {(() => {
+                  const now = new Date();
+                  const currentMonthLabel = now.toLocaleDateString('en-US', { month: 'short' });
+                  const months = [];
+                  for (let i = 5; i >= 0; i--) {
+                    const d = new Date();
+                    d.setMonth(d.getMonth() - i);
+                    months.push(d.toLocaleDateString('en-US', { month: 'short' }));
+                  }
+                  return months.map((month, i) => {
+                    const isCurrentMonth = month === currentMonthLabel;
+                    const actualDay = isCurrentMonth ? now.getDate() : 15;
+                    const heights = [65, 80, 70, 90, 75, actualDay];
+                    const height = heights[i];
+                    
+                    return (
+                      <div key={month} className="flex-1 flex flex-col items-center gap-2">
+                        <div 
+                          className={cn(
+                            "w-full rounded-t-lg transition-all",
+                            isCurrentMonth ? "gradient-primary" : "bg-white/20"
+                          )}
+                          style={{ height: `${Math.min(height * 2, 100)}%` }}
+                        />
+                        <span className={cn(
+                          "text-xs",
+                          isCurrentMonth ? "text-primary-start font-medium" : "text-foreground-tertiary"
+                        )}>
+                          {month}
+                        </span>
+                      </div>
+                    );
+                  });
+                })()}
               </div>
               <p className="text-center text-sm text-foreground-secondary mt-4">
                 Your spending is 8% lower than last month at this point

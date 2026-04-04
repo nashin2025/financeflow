@@ -64,6 +64,38 @@ export default function AnalyticsPage() {
 
   const netWorth = accounts.reduce((sum, a) => sum + a.balance, 0);
 
+  const currentMonthStr = new Date().toLocaleDateString('en-US', { month: 'short' });
+
+  const handleExport = () => {
+    let csvContent = "";
+    const filename = `analytics_${activeTab}_export.csv`;
+
+    if (activeTab === "spending") {
+      csvContent = [
+        "Category,Amount,Percentage",
+        ...spendingWithPercentage.map(c => `"${c.name}",${c.amount.toFixed(2)},${c.percentage.toFixed(1)}%`),
+      ].join("\n");
+    } else if (activeTab === "income") {
+      csvContent = [
+        "Month,Income",
+        ...monthlyData.map(d => `${d.month},${d.income.toFixed(2)}`),
+      ].join("\n");
+    } else {
+      csvContent = [
+        "Account,Type,Balance",
+        ...accounts.map(a => `"${a.name}","${a.type}",${a.balance.toFixed(2)}`),
+      ].join("\n");
+    }
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const monthlyData = React.useMemo(() => {
     const last6Months = [];
     for (let i = 5; i >= 0; i--) {
@@ -142,11 +174,11 @@ export default function AnalyticsPage() {
             </div>
             
             <div className="flex gap-2">
-              <Button variant="secondary" size="sm">
+              <Button variant="secondary" size="sm" onClick={() => alert("Filter options coming soon")}>
                 <Filter className="h-4 w-4 mr-2" />
                 Filter
               </Button>
-              <Button variant="secondary" size="sm">
+              <Button variant="secondary" size="sm" onClick={handleExport}>
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
@@ -296,7 +328,7 @@ export default function AnalyticsPage() {
                     <div className="h-64 flex items-end justify-between gap-3">
                       {monthlyData.map((data, i) => {
                         const height = (data.expenses / maxExpense) * 100;
-                        const isCurrentMonth = data.month === "Nov";
+                        const isCurrentMonth = data.month === currentMonthStr;
                         
                         return (
                           <div key={data.month} className="flex-1 flex flex-col items-center gap-2">
@@ -411,7 +443,7 @@ export default function AnalyticsPage() {
                     {monthlyData.map((data, i) => {
                       const maxIncome = Math.max(...monthlyData.map(d => d.income));
                       const height = (data.income / maxIncome) * 100;
-                      const isCurrentMonth = data.month === "Nov";
+                      const isCurrentMonth = data.month === currentMonthStr;
                       
                       return (
                         <div key={data.month} className="flex-1 flex flex-col items-center gap-2">
@@ -471,11 +503,19 @@ export default function AnalyticsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="h-64 flex items-end justify-between gap-3">
-                    {["Jun", "Jul", "Aug", "Sep", "Oct", "Nov"].map((month, i) => {
+                    {(() => {
+                      const months = [];
+                      for (let i = 5; i >= 0; i--) {
+                        const d = new Date();
+                        d.setMonth(d.getMonth() - i);
+                        months.push(d.toLocaleDateString('en-US', { month: 'short' }));
+                      }
+                      return months;
+                    })().map((month, i) => {
                       const values = [10000, 10500, 10800, 11200, 11800, 12458];
                       const maxValue = 15000;
                       const height = (values[i] / maxValue) * 100;
-                      const isCurrentMonth = month === "Nov";
+                      const isCurrentMonth = month === currentMonthStr;
                       
                       return (
                         <div key={month} className="flex-1 flex flex-col items-center gap-2">

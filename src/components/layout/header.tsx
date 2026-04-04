@@ -5,7 +5,9 @@ import { cn } from "@/lib/utils";
 import { Search, Bell, Menu, X } from "lucide-react";
 import { Input } from "@/components/ui";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAppStore } from "@/stores/app-store";
+import { getInitials } from "@/lib/utils";
 
 interface HeaderProps {
   className?: string;
@@ -36,9 +38,13 @@ export function Header({
   showNotifications = true,
 }: HeaderProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user } = useAppStore();
   const [searchOpen, setSearchOpen] = React.useState(false);
   const [notificationsOpen, setNotificationsOpen] = React.useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const initials = user ? getInitials(user.name) : "AC";
 
   return (
     <>
@@ -73,6 +79,8 @@ export function Header({
                 placeholder="Search..."
                 className="w-64 h-9 bg-white/5 border-white/10 focus:w-80 transition-all"
                 icon={<Search className="h-4 w-4" />}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           )}
@@ -101,7 +109,13 @@ export function Header({
                 <div className="absolute right-0 top-full mt-2 w-80 glass-elevated rounded-xl p-4 animate-fadeIn">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-semibold text-foreground">Notifications</h3>
-                    <button className="text-sm text-primary-start hover:underline">
+                    <button
+                      className="text-sm text-primary-start hover:underline"
+                      onClick={() => {
+                        setNotificationsOpen(false);
+                        router.push("/notifications");
+                      }}
+                    >
                       Mark all read
                     </button>
                   </div>
@@ -129,7 +143,7 @@ export function Header({
           {/* User Avatar */}
           <Link href="/profile" className="flex items-center space-x-2">
             <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center">
-              <span className="text-white text-sm font-medium">AC</span>
+              <span className="text-white text-sm font-medium">{initials}</span>
             </div>
           </Link>
         </div>

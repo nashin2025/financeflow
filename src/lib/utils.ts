@@ -6,9 +6,17 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number, currency: string = "MVR"): string {
+  const currencyMap: Record<string, string> = {
+    MVR: "MVR",
+    USD: "USD",
+    EUR: "EUR",
+    GBP: "GBP",
+    INR: "INR",
+    SGD: "SGD",
+  };
   return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "MVR",
+    currency: currencyMap[currency] || "MVR",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);

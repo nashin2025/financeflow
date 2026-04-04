@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/stores/app-store";
+import { useRouter } from "next/navigation";
 import { formatCurrency, cn } from "@/lib/utils";
 import Link from "next/link";
 import { 
@@ -29,7 +30,8 @@ import {
 } from "lucide-react";
 
 export default function ProfilePage() {
-  const { user, transactions, accounts, budgets, goals, setUser, isPremium } = useAppStore();
+  const { user, transactions, accounts, goals, setUser, isPremium, logout } = useAppStore();
+  const router = useRouter();
   const [showEditModal, setShowEditModal] = React.useState(false);
   const [editName, setEditName] = React.useState(user?.name || "");
   const [editEmail, setEditEmail] = React.useState(user?.email || "");
@@ -77,7 +79,7 @@ export default function ProfilePage() {
                   <div className="w-24 h-24 rounded-2xl gradient-primary flex items-center justify-center text-4xl font-bold text-white">
                     {user?.name?.split(" ").map(n => n[0]).join("") || "AC"}
                   </div>
-                  <button className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-background-elevated border-2 border-background flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <button onClick={() => alert("Profile photo upload coming soon")} className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-background-elevated border-2 border-background flex items-center justify-center hover:bg-white/10 transition-colors">
                     <Camera className="h-4 w-4 text-foreground-secondary" />
                   </button>
                 </div>
@@ -232,7 +234,10 @@ export default function ProfilePage() {
               </div>
               <ChevronRight className="h-4 w-4 text-foreground-tertiary" />
             </Link>
-            <button className="w-full flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+            <button 
+              onClick={() => { logout(); router.push("/login"); }}
+              className="w-full flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+            >
               <div className="flex items-center gap-3">
                 <LogOut className="h-5 w-5 text-error" />
                 <span className="text-error">Sign Out</span>

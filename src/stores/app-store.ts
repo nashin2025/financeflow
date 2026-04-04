@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import type { Transaction, Account, Budget, Goal, Category } from "@/types";
 
+const STORAGE_KEY = "financeflow_state";
+
 interface AppState {
   isAuthenticated: boolean;
   isPremium: boolean;
@@ -69,6 +71,64 @@ interface AppState {
   setSecurity: (security: Partial<AppState["security"]>) => void;
 }
 
+function loadFromStorage() {
+  if (typeof window === "undefined") return null;
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return null;
+    const parsed = JSON.parse(saved);
+    return {
+      user: parsed.user || null,
+      isPremium: parsed.isPremium || false,
+      transactions: parsed.transactions || [],
+      accounts: parsed.accounts || [],
+      budgets: parsed.budgets || [],
+      goals: parsed.goals || [],
+      theme: parsed.theme || "dark",
+      currency: parsed.currency || "MVR",
+      language: parsed.language || "English",
+      weekStartsOn: parsed.weekStartsOn || "monday",
+      budgetPeriod: parsed.budgetPeriod || "monthly",
+      notifications: parsed.notifications || {
+        push: true,
+        email: true,
+        budgetAlerts: true,
+        billReminders: true,
+        aiInsights: true,
+      },
+      security: parsed.security || {
+        twoFactor: false,
+        biometric: false,
+      },
+    };
+  } catch {
+    return null;
+  }
+}
+
+function saveToStorage(state: Partial<AppState>) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      user: state.user,
+      isPremium: state.isPremium,
+      transactions: state.transactions,
+      accounts: state.accounts,
+      budgets: state.budgets,
+      goals: state.goals,
+      theme: state.theme,
+      currency: state.currency,
+      language: state.language,
+      weekStartsOn: state.weekStartsOn,
+      budgetPeriod: state.budgetPeriod,
+      notifications: state.notifications,
+      security: state.security,
+    }));
+  } catch {
+    // Storage full or unavailable
+  }
+}
+
 const getDefaultCategories = (): Category[] => [
   { id: "1", name: "Housing/Rent", icon: "🏠", color: "#6366F1", type: "expense", isSystem: true, sortOrder: 1, isActive: true },
   { id: "2", name: "Groceries", icon: "🛒", color: "#10B981", type: "expense", isSystem: true, sortOrder: 2, isActive: true },
@@ -87,102 +147,174 @@ const getDefaultCategories = (): Category[] => [
   { id: "15", name: "Investments", icon: "📈", color: "#06B6D4", type: "income", isSystem: true, sortOrder: 3, isActive: true },
 ];
 
+const savedState = loadFromStorage();
+
 const initialState = {
-  isAuthenticated: false,
-  isPremium: false,
-  user: null,
-  transactions: [],
-  accounts: [],
-  budgets: [],
-  goals: [],
+  isAuthenticated: !!savedState?.user,
+  isPremium: savedState?.isPremium || false,
+  user: savedState?.user || null,
+  transactions: savedState?.transactions || [],
+  accounts: savedState?.accounts || [],
+  budgets: savedState?.budgets || [],
+  goals: savedState?.goals || [],
   categories: getDefaultCategories(),
-  theme: "dark" as const,
-  currency: "MVR",
-  language: "English",
-  weekStartsOn: "monday" as const,
-  budgetPeriod: "monthly" as const,
-  notifications: {
+  theme: (savedState?.theme || "dark") as "dark" | "light",
+  currency: savedState?.currency || "MVR",
+  language: savedState?.language || "English",
+  weekStartsOn: (savedState?.weekStartsOn || "monday") as "monday" | "sunday",
+  budgetPeriod: (savedState?.budgetPeriod || "monthly") as "weekly" | "monthly" | "yearly",
+  notifications: savedState?.notifications || {
     push: true,
     email: true,
     budgetAlerts: true,
     billReminders: true,
     aiInsights: true,
   },
-  security: {
+  security: savedState?.security || {
     twoFactor: false,
     biometric: false,
   },
 };
 
-export const useAppStore = create<AppState>((set) => ({
+export const useAppStore = create<AppState>((set, get) => ({
   ...initialState,
   
-  setUser: (user) => set({ user }),
-  logout: () => set({ isAuthenticated: false, user: null }),
+  setUser: (user) => {
+    set({ user, isAuthenticated: !!user });
+    saveToStorage(get());
+  },
+  logout: () => {
+    set({ isAuthenticated: false, user: null });
+    saveToStorage(get());
+  },
   
-  setTransactions: (transactions) => set({ transactions }),
-  addTransaction: (transaction) => set((state) => ({ 
-    transactions: [transaction, ...state.transactions] 
-  })),
-  updateTransaction: (id, data) => set((state) => ({
-    transactions: state.transactions.map((t) => 
-      t.id === id ? { ...t, ...data } : t
-    )
-  })),
-  deleteTransaction: (id) => set((state) => ({
-    transactions: state.transactions.filter((t) => t.id !== id)
-  })),
+  setTransactions: (transactions) => {
+    set({ transactions });
+    saveToStorage(get());
+  },
+  addTransaction: (transaction) => {
+    set((state) => ({ transactions: [transaction, ...state.transactions] }));
+    saveToStorage(get());
+  },
+  updateTransaction: (id, data) => {
+    set((state) => ({
+      transactions: state.transactions.map((t) => 
+        t.id === id ? { ...t, ...data } : t
+      )
+    }));
+    saveToStorage(get());
+  },
+  deleteTransaction: (id) => {
+    set((state) => ({
+      transactions: state.transactions.filter((t) => t.id !== id)
+    }));
+    saveToStorage(get());
+  },
   
-  setAccounts: (accounts) => set({ accounts }),
-  addAccount: (account) => set((state) => ({ 
-    accounts: [...state.accounts, account] 
-  })),
-  updateAccount: (id, data) => set((state) => ({
-    accounts: state.accounts.map((a) => 
-      a.id === id ? { ...a, ...data } : a
-    )
-  })),
-  deleteAccount: (id) => set((state) => ({
-    accounts: state.accounts.filter((a) => a.id !== id)
-  })),
+  setAccounts: (accounts) => {
+    set({ accounts });
+    saveToStorage(get());
+  },
+  addAccount: (account) => {
+    set((state) => ({ accounts: [...state.accounts, account] }));
+    saveToStorage(get());
+  },
+  updateAccount: (id, data) => {
+    set((state) => ({
+      accounts: state.accounts.map((a) => 
+        a.id === id ? { ...a, ...data } : a
+      )
+    }));
+    saveToStorage(get());
+  },
+  deleteAccount: (id) => {
+    set((state) => ({
+      accounts: state.accounts.filter((a) => a.id !== id)
+    }));
+    saveToStorage(get());
+  },
   
-  setBudgets: (budgets) => set({ budgets }),
-  addBudget: (budget) => set((state) => ({ 
-    budgets: [...state.budgets, budget] 
-  })),
-  updateBudget: (id, data) => set((state) => ({
-    budgets: state.budgets.map((b) => 
-      b.id === id ? { ...b, ...data } : b
-    )
-  })),
-  deleteBudget: (id) => set((state) => ({
-    budgets: state.budgets.filter((b) => b.id !== id)
-  })),
+  setBudgets: (budgets) => {
+    set({ budgets });
+    saveToStorage(get());
+  },
+  addBudget: (budget) => {
+    set((state) => ({ budgets: [...state.budgets, budget] }));
+    saveToStorage(get());
+  },
+  updateBudget: (id, data) => {
+    set((state) => ({
+      budgets: state.budgets.map((b) => 
+        b.id === id ? { ...b, ...data } : b
+      )
+    }));
+    saveToStorage(get());
+  },
+  deleteBudget: (id) => {
+    set((state) => ({
+      budgets: state.budgets.filter((b) => b.id !== id)
+    }));
+    saveToStorage(get());
+  },
   
-  setGoals: (goals) => set({ goals }),
-  addGoal: (goal) => set((state) => ({ 
-    goals: [...state.goals, goal] 
-  })),
-  updateGoal: (id, data) => set((state) => ({
-    goals: state.goals.map((g) => 
-      g.id === id ? { ...g, ...data } : g
-    )
-  })),
-  deleteGoal: (id) => set((state) => ({
-    goals: state.goals.filter((g) => g.id !== id)
-  })),
+  setGoals: (goals) => {
+    set({ goals });
+    saveToStorage(get());
+  },
+  addGoal: (goal) => {
+    set((state) => ({ goals: [...state.goals, goal] }));
+    saveToStorage(get());
+  },
+  updateGoal: (id, data) => {
+    set((state) => ({
+      goals: state.goals.map((g) => 
+        g.id === id ? { ...g, ...data } : g
+      )
+    }));
+    saveToStorage(get());
+  },
+  deleteGoal: (id) => {
+    set((state) => ({
+      goals: state.goals.filter((g) => g.id !== id)
+    }));
+    saveToStorage(get());
+  },
   
   setCategories: (categories) => set({ categories }),
-  setTheme: (theme) => set({ theme }),
-  setPremium: (isPremium: boolean) => set({ isPremium }),
-  setCurrency: (currency) => set({ currency }),
-  setLanguage: (language) => set({ language }),
-  setWeekStartsOn: (weekStartsOn) => set({ weekStartsOn }),
-  setBudgetPeriod: (budgetPeriod) => set({ budgetPeriod }),
-  setNotifications: (notifications) => set((state) => ({ 
-    notifications: { ...state.notifications, ...notifications } 
-  })),
-  setSecurity: (security) => set((state) => ({ 
-    security: { ...state.security, ...security } 
-  })),
+  setTheme: (theme) => {
+    set({ theme });
+    saveToStorage(get());
+  },
+  setPremium: (isPremium: boolean) => {
+    set({ isPremium });
+    saveToStorage(get());
+  },
+  setCurrency: (currency) => {
+    set({ currency });
+    saveToStorage(get());
+  },
+  setLanguage: (language) => {
+    set({ language });
+    saveToStorage(get());
+  },
+  setWeekStartsOn: (weekStartsOn) => {
+    set({ weekStartsOn });
+    saveToStorage(get());
+  },
+  setBudgetPeriod: (budgetPeriod) => {
+    set({ budgetPeriod });
+    saveToStorage(get());
+  },
+  setNotifications: (notifications) => {
+    set((state) => ({ 
+      notifications: { ...state.notifications, ...notifications } 
+    }));
+    saveToStorage(get());
+  },
+  setSecurity: (security) => {
+    set((state) => ({ 
+      security: { ...state.security, ...security } 
+    }));
+    saveToStorage(get());
+  },
 }));

@@ -7,24 +7,23 @@ import { Header } from "@/components/layout/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency, cn } from "@/lib/utils";
+import { DropdownMenu } from "@/components/ui/dropdown-menu";
+import { formatCurrency } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
 import { 
   Plus, 
   Landmark,
-  CreditCard,
-  PiggyBank,
-  Wallet,
   TrendingUp,
   MoreHorizontal,
   RefreshCw,
   Link as LinkIcon,
-  Building2
+  Pencil,
+  Trash2
 } from "lucide-react";
 
 export default function AccountsPage() {
-  const { accounts, user } = useAppStore();
-  
+  const { accounts } = useAppStore();
+    
   if (accounts.length === 0) {
     return (
       <div className="min-h-screen">
@@ -40,7 +39,7 @@ export default function AccountsPage() {
               </div>
               <h1 className="text-2xl font-bold text-foreground mb-2">No Accounts Yet</h1>
               <p className="text-foreground-secondary mb-6">Add your first bank account to start tracking your finances.</p>
-              <Button className="w-full">
+              <Button onClick={() => alert("Add account form coming soon")}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Your First Account
               </Button>
@@ -88,6 +87,14 @@ export default function AccountsPage() {
     return acc;
   }, {});
 
+  const handleEditAccount = (accountId: string) => {
+    alert("Edit account form coming soon");
+  };
+
+  const handleDeleteAccount = (accountId: string) => {
+    alert("Delete account confirmation coming soon");
+  };
+
   return (
     <div className="min-h-screen">
       <div className="hidden lg:block">
@@ -108,7 +115,7 @@ export default function AccountsPage() {
                 Manage and track all your financial accounts
               </p>
             </div>
-            <Button>
+            <Button onClick={() => alert("Add account form coming soon")}>
               <Plus className="h-4 w-4 mr-2" />
               Add Account
             </Button>
@@ -155,7 +162,7 @@ export default function AccountsPage() {
                 <LinkIcon className="h-5 w-5 text-primary-start" />
                 Connected Institutions
               </CardTitle>
-              <Button variant="secondary" size="sm">
+              <Button variant="secondary" size="sm" onClick={() => alert("Sync feature coming soon")}>
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Sync All
               </Button>
@@ -163,7 +170,10 @@ export default function AccountsPage() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {/* Add new connection */}
-                <button className="p-4 rounded-xl border-2 border-dashed border-white/10 hover:border-primary-start/50 hover:bg-primary-start/5 transition-all flex flex-col items-center justify-center gap-2 text-foreground-secondary hover:text-primary-start min-h-[120px]">
+                <button
+                  className="p-4 rounded-xl border-2 border-dashed border-white/10 hover:border-primary-start/50 hover:bg-primary-start/5 transition-all flex flex-col items-center justify-center gap-2 text-foreground-secondary hover:text-primary-start min-h-[120px]"
+                  onClick={() => alert("Bank connection feature coming soon")}
+                >
                   <Plus className="h-5 w-5" />
                   <span className="text-sm">Connect New Bank</span>
                 </button>
@@ -206,9 +216,17 @@ export default function AccountsPage() {
                           <Badge variant="success" className="text-xs">Active</Badge>
                         )}
                       </div>
-                      <button className="p-2 rounded-lg hover:bg-white/10 transition-colors">
-                        <MoreHorizontal className="h-4 w-4 text-foreground-secondary" />
-                      </button>
+                      <DropdownMenu
+                        trigger={
+                          <button className="p-2 rounded-lg hover:bg-white/10 transition-colors">
+                            <MoreHorizontal className="h-4 w-4 text-foreground-secondary" />
+                          </button>
+                        }
+                        items={[
+                          { label: "Edit", onClick: () => handleEditAccount(account.id) },
+                          { label: "Delete", onClick: () => handleDeleteAccount(account.id), variant: "destructive" },
+                        ]}
+                      />
                     </div>
                   </div>
                 ))}
@@ -249,9 +267,17 @@ export default function AccountsPage() {
                         </p>
                         <p className="text-xs text-foreground-tertiary">Balance</p>
                       </div>
-                      <button className="p-2 rounded-lg hover:bg-white/10 transition-colors">
-                        <MoreHorizontal className="h-4 w-4 text-foreground-secondary" />
-                      </button>
+                      <DropdownMenu
+                        trigger={
+                          <button className="p-2 rounded-lg hover:bg-white/10 transition-colors">
+                            <MoreHorizontal className="h-4 w-4 text-foreground-secondary" />
+                          </button>
+                        }
+                        items={[
+                          { label: "Edit", onClick: () => handleEditAccount(account.id) },
+                          { label: "Delete", onClick: () => handleDeleteAccount(account.id), variant: "destructive" },
+                        ]}
+                      />
                     </div>
                   </div>
                 ))}
@@ -261,25 +287,37 @@ export default function AccountsPage() {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <button className="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex flex-col items-center gap-2 text-center">
+            <button
+              className="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex flex-col items-center gap-2 text-center"
+              onClick={() => alert("Bank connection feature coming soon")}
+            >
               <div className="w-10 h-10 rounded-xl bg-primary-start/20 flex items-center justify-center">
                 <LinkIcon className="h-5 w-5 text-primary-start" />
               </div>
               <span className="text-sm font-medium text-foreground">Connect Bank</span>
             </button>
-            <button className="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex flex-col items-center gap-2 text-center">
+            <button
+              className="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex flex-col items-center gap-2 text-center"
+              onClick={() => alert("Add account form coming soon")}
+            >
               <div className="w-10 h-10 rounded-xl bg-success/20 flex items-center justify-center">
                 <Plus className="h-5 w-5 text-success" />
               </div>
               <span className="text-sm font-medium text-foreground">Add Manual</span>
             </button>
-            <button className="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex flex-col items-center gap-2 text-center">
+            <button
+              className="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex flex-col items-center gap-2 text-center"
+              onClick={() => alert("Sync feature coming soon")}
+            >
               <div className="w-10 h-10 rounded-xl bg-warning/20 flex items-center justify-center">
                 <RefreshCw className="h-5 w-5 text-warning" />
               </div>
               <span className="text-sm font-medium text-foreground">Sync All</span>
             </button>
-            <button className="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex flex-col items-center gap-2 text-center">
+            <button
+              className="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex flex-col items-center gap-2 text-center"
+              onClick={() => alert("Transaction history view coming soon")}
+            >
               <div className="w-10 h-10 rounded-xl bg-info/20 flex items-center justify-center">
                 <TrendingUp className="h-5 w-5 text-info" />
               </div>

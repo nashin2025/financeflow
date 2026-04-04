@@ -39,7 +39,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { type, amount, currency, description, merchantName, date, note, accountId, categoryId, isRecurring, isExcluded, tags } = body
+    const { type, amount, currency, description, merchantName, date, note, accountId, categoryId, isRecurring, isExcluded, tags, userId } = body
 
     if (!type || !amount || !date) {
       return NextResponse.json({ error: 'Type, amount, and date are required' }, { status: 400 })
@@ -59,6 +59,7 @@ export async function POST(request: Request) {
         isRecurring: isRecurring || false,
         isExcluded: isExcluded || false,
         tags: tags ? JSON.stringify(tags) : '[]',
+        userId: userId || '1',
       },
       include: {
         account: { select: { id: true, name: true, type: true } },

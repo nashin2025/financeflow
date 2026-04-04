@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, type, targetAmount, targetDate, icon, color, monthlyContribution } = body
+    const { name, type, targetAmount, targetDate, icon, color, monthlyContribution, userId } = body
 
     if (!name || !type || !targetAmount || !targetDate) {
       return NextResponse.json({ error: 'Name, type, targetAmount, and targetDate are required' }, { status: 400 })
@@ -39,6 +39,7 @@ export async function POST(request: Request) {
         icon: icon || null,
         color: color || null,
         monthlyContribution: monthlyContribution ? parseFloat(monthlyContribution) : 0,
+        userId: userId || '1',
       },
     })
 

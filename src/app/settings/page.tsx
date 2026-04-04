@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/stores/app-store";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { 
   User, 
@@ -77,8 +78,9 @@ export default function SettingsPage() {
     currency, setCurrency, language, setLanguage, 
     weekStartsOn, setWeekStartsOn, budgetPeriod, setBudgetPeriod,
     notifications, setNotifications,
-    security, setSecurity
+    security, setSecurity, logout
   } = useAppStore();
+  const router = useRouter();
   const [showUpgradeMsg, setShowUpgradeMsg] = React.useState(false);
   const [showCurrencyModal, setShowCurrencyModal] = React.useState(false);
   const [showLanguageModal, setShowLanguageModal] = React.useState(false);
@@ -193,7 +195,7 @@ export default function SettingsPage() {
                     )}
                   </div>
                 </div>
-                <Button variant="secondary" size="sm">
+                <Button variant="secondary" size="sm" onClick={() => alert("Edit profile coming soon")}>
                   Edit Profile
                 </Button>
               </div>
@@ -486,6 +488,7 @@ export default function SettingsPage() {
                   icon={<CreditCard className="h-5 w-5" />}
                   label="Connected Accounts"
                   description="Manage linked accounts"
+                  onClick={() => alert("Connected accounts management coming soon")}
                 />
                 <SettingsItem
                   icon={<Trash2 className="h-5 w-5" />}
@@ -511,22 +514,47 @@ export default function SettingsPage() {
                 <SettingsItem
                   icon={<HelpCircle className="h-5 w-5" />}
                   label="Help Center"
+                  onClick={() => alert("Help Center opening...")}
                 />
                 <SettingsItem
                   icon={<MessageCircle className="h-5 w-5" />}
                   label="Contact Support"
+                  onClick={() => alert("Contact support at: support@financeflow.app")}
                 />
                 <SettingsItem
                   icon={<Star className="h-5 w-5" />}
                   label="Rate App"
+                  onClick={() => alert("Thank you for your interest!")}
                 />
                 <SettingsItem
                   icon={<FileText className="h-5 w-5" />}
                   label="Privacy Policy"
+                  onClick={() => alert("Privacy Policy page coming soon")}
                 />
                 <SettingsItem
                   icon={<FileText className="h-5 w-5" />}
                   label="Terms of Service"
+                  onClick={() => alert("Terms of Service page coming soon")}
+                />
+                <SettingsItem
+                  icon={<MessageCircle className="h-5 w-5" />}
+                  label="Contact Support"
+                  onClick={() => alert("Contact support at: support@financeflow.app")}
+                />
+                <SettingsItem
+                  icon={<Star className="h-5 w-5" />}
+                  label="Rate App"
+                  onClick={() => alert("Thank you for your interest!")}
+                />
+                <SettingsItem
+                  icon={<FileText className="h-5 w-5" />}
+                  label="Privacy Policy"
+                  onClick={() => alert("Privacy Policy page coming soon")}
+                />
+                <SettingsItem
+                  icon={<FileText className="h-5 w-5" />}
+                  label="Terms of Service"
+                  onClick={() => alert("Terms of Service page coming soon")}
                 />
               </div>
             </CardContent>
@@ -534,7 +562,10 @@ export default function SettingsPage() {
 
           {/* Sign Out */}
           <Card variant="glass" className="!p-0">
-            <button className="w-full flex items-center justify-between p-4 rounded-xl hover:bg-error/10 transition-colors text-left group">
+            <button 
+              onClick={() => { logout(); router.push("/login"); }}
+              className="w-full flex items-center justify-between p-4 rounded-xl hover:bg-error/10 transition-colors text-left group"
+            >
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-error/20 flex items-center justify-center group-hover:bg-error/30">
                   <LogOut className="h-5 w-5 text-error" />

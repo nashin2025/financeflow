@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ProgressRing } from "@/components/ui/progress";
 import { useAppStore } from "@/stores/app-store";
 import { formatCurrency, cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 import { 
   Send, 
   Sparkles, 
@@ -30,6 +31,7 @@ interface ChatMessage {
 }
 
 export default function AIPage() {
+  const router = useRouter();
   const { transactions, categories, budgets, goals, accounts } = useAppStore();
   const [messages, setMessages] = React.useState<ChatMessage[]>([
     {
@@ -406,7 +408,7 @@ export default function AIPage() {
                       </div>
                     );
                   })}
-                  <button className="w-full p-3 rounded-lg text-sm text-primary-start hover:bg-white/5 transition-colors flex items-center justify-center gap-1">
+                  <button onClick={() => router.push("/goals")} className="w-full p-3 rounded-lg text-sm text-primary-start hover:bg-white/5 transition-colors flex items-center justify-center gap-1">
                     View all goals <ChevronRight className="h-4 w-4" />
                   </button>
                 </CardContent>

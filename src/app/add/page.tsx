@@ -33,7 +33,7 @@ const quickCategories = [
 
 export default function AddTransactionPage() {
   const router = useRouter();
-  const { categories, addTransaction, accounts } = useAppStore();
+  const { categories, addTransaction, accounts, user } = useAppStore();
   
   const [type, setType] = React.useState<TransactionType>("expense");
   const [amount, setAmount] = React.useState("");
@@ -44,19 +44,27 @@ export default function AddTransactionPage() {
   const [accountId, setAccountId] = React.useState(accounts[0]?.id || "1");
   const [isRecurring, setIsRecurring] = React.useState(false);
   const [showSuccess, setShowSuccess] = React.useState(false);
+  const [error, setError] = React.useState("");
 
   const filteredCategories = categories.filter(c => c.type === (type === "expense" ? "expense" : "income"));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    
+    const parsedAmount = parseFloat(amount);
+    if (!amount || isNaN(parsedAmount) || parsedAmount <= 0) {
+      setError("Please enter a valid amount");
+      return;
+    }
     
     const newTransaction = {
       id: Date.now().toString(),
-      userId: "1",
+      userId: user?.id || "1",
       accountId,
       categoryId: categoryId || filteredCategories[0]?.id || "1",
       type,
-      amount: parseFloat(amount) || 0,
+      amount: parsedAmount,
       currency: "USD",
       description: description || "Transaction",
       merchantName: description || "Transaction",
@@ -113,6 +121,11 @@ export default function AddTransactionPage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="max-w-lg mx-auto space-y-6">
+              {error && (
+                <div className="p-3 rounded-lg bg-error/10 border border-error/20 text-sm text-error">
+                  {error}
+                </div>
+              )}
               {/* Type Toggle */}
               <div className="flex rounded-xl bg-white/5 p-1">
                 <button
@@ -233,6 +246,7 @@ export default function AddTransactionPage() {
                 </button>
                 <button
                   type="button"
+                  onClick={() => alert("Receipt scanning feature coming soon")}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-foreground-secondary hover:text-foreground transition-colors"
                 >
                   <Camera className="h-4 w-4" />

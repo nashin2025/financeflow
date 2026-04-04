@@ -26,7 +26,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, type, icon, color, sortOrder } = body
+    const { name, type, icon, color, sortOrder, userId } = body
 
     if (!name || !type) {
       return NextResponse.json({ error: 'Name and type are required' }, { status: 400 })
@@ -39,6 +39,7 @@ export async function POST(request: Request) {
         icon: icon || null,
         color: color || null,
         sortOrder: sortOrder || 0,
+        userId: userId || '1',
       },
     })
 

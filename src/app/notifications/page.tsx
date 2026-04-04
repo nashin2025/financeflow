@@ -20,6 +20,7 @@ import {
   Filter,
   Check
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface Notification {
   id: string;
@@ -30,9 +31,18 @@ interface Notification {
   createdAt: string;
 }
 
+const sampleNotifications: Notification[] = [
+  { id: "1", type: "budget_alert" as const, title: "Budget Alert", message: "Dining Out is at 75% of your monthly budget", isRead: false, createdAt: "2 hours ago" },
+  { id: "2", type: "goal_milestone" as const, title: "Goal Milestone", message: "Emergency Fund reached 50% of target", isRead: false, createdAt: "Yesterday" },
+  { id: "3", type: "insight" as const, title: "AI Insight", message: "Your grocery spending is 15% lower than last month. Great job!", isRead: true, createdAt: "2 days ago" },
+  { id: "4", type: "bill_reminder" as const, title: "Bill Reminder", message: "Internet bill of Rf 450 is due in 3 days", isRead: true, createdAt: "3 days ago" },
+  { id: "5", type: "system" as const, title: "Welcome", message: "Welcome to FinanceFlow! Start tracking your finances today.", isRead: true, createdAt: "1 week ago" },
+];
+
 export default function NotificationsPage() {
+  const router = useRouter();
   const [filter, setFilter] = React.useState<"all" | "unread">("all");
-  const [notifications, setNotifications] = React.useState<Notification[]>([]);
+  const [notifications, setNotifications] = React.useState<Notification[]>(sampleNotifications);
 
   const filteredNotifications = filter === "unread" 
     ? notifications.filter(n => !n.isRead)
@@ -183,7 +193,10 @@ export default function NotificationsPage() {
 
           {/* Notification Settings Link */}
           <Card variant="glass" className="!p-0">
-            <button className="w-full flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-colors text-left">
+            <button
+              className="w-full flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-colors text-left"
+              onClick={() => router.push("/settings")}
+            >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
                   <Bell className="h-5 w-5 text-foreground-secondary" />

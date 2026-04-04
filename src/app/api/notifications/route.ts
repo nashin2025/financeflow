@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 
 export async function GET(request: Request) {
   try {
@@ -26,7 +27,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { type, title, message, data } = body
+    const { type, title, message, data, userId } = body
 
     if (!type || !title || !message) {
       return NextResponse.json({ error: 'Type, title, and message are required' }, { status: 400 })
@@ -34,10 +35,11 @@ export async function POST(request: Request) {
 
     const notification = await prisma.notification.create({
       data: {
+        userId: userId || '1',
         type,
         title,
         message,
-        data: data ? JSON.stringify(data) : null,
+        data: data ? JSON.parse(data) : Prisma.JsonNull,
       },
     })
 

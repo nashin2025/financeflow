@@ -3,7 +3,9 @@ import prisma from '@/lib/prisma'
 
 export async function GET() {
   try {
+    const id = '1'
     const user = await prisma.user.findUnique({
+      where: { id },
       select: {
         id: true,
         email: true,
@@ -44,6 +46,8 @@ export async function PUT(request: Request) {
     }
 
     const user = await prisma.user.update({
+      where: { id: '1' },
+      data: { name },
       select: {
         id: true,
         email: true,

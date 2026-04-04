@@ -18,7 +18,9 @@ import {
   ChevronUp,
   Calendar,
   ArrowUpDown,
-  MoreHorizontal
+  MoreHorizontal,
+  Pencil,
+  Trash2
 } from "lucide-react";
 import Link from "next/link";
 
@@ -26,12 +28,61 @@ type SortOption = "date" | "amount" | "category";
 type Order = "asc" | "desc";
 
 export default function TransactionsPage() {
-  const { transactions, categories } = useAppStore();
+  const { transactions, categories, deleteTransaction } = useAppStore();
+  const [menuOpenId, setMenuOpenId] = React.useState<string | null>(null);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [typeFilter, setTypeFilter] = React.useState<"all" | "expense" | "income">("all");
   const [sortBy, setSortBy] = React.useState<SortOption>("date");
   const [sortOrder, setSortOrder] = React.useState<Order>("desc");
   const [expandedDate, setExpandedDate] = React.useState<string | null>(null);
+
+  const getCategoryInfo = (categoryId: string) => {
+    const category = categories.find(c => c.id === categoryId);
+    return category || { name: "Other", icon: "📦", color: "#9CA3AF" };
+  };
+
+  const filteredTransactions = React.useMemo(() => {
+    let filtered = transactions;
+    if (typeFilter !== "all") {
+      filtered = filtered.filter(t => t.type === typeFilter);
+    }
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        t => {
+          const cat = categories.find(c => c.id === t.categoryId);
+          const catName = cat?.name || "Other";
+          return (
+            t.merchantName.toLowerCase().includes(query) ||
+            t.description?.toLowerCase().includes(query) ||
+            catName.toLowerCase().includes(query)
+          );
+        }
+      );
+    }
+    filtered.sort((a, b) => {
+      const multiplier = sortOrder === "asc" ? 1 : -1;
+      if (sortBy === "date") return multiplier * (new Date(a.date).getTime() - new Date(b.date).getTime());
+      if (sortBy === "amount") return multiplier * (a.amount - b.amount);
+      return multiplier * a.categoryId.localeCompare(b.categoryId);
+    });
+    return filtered;
+  }, [transactions, typeFilter, searchQuery, sortBy, sortOrder, categories]);
+
+  const groupedTransactions = React.useMemo(() => {
+    const groups: Record<string, typeof transactions> = {};
+    filteredTransactions.forEach(t => {
+      if (!groups[t.date]) groups[t.date] = [];
+      groups[t.date].push(t);
+    });
+    return Object.entries(groups)
+      .sort(([a], [b]) => new Date(b).getTime() - new Date(a).getTime())
+      .map(([date, txns]) => ({
+        date,
+        transactions: txns,
+        total: txns.reduce((sum, t) => sum + (t.type === "income" ? t.amount : -t.amount), 0),
+      }));
+  }, [filteredTransactions]);
 
   return (
     <div className="min-h-screen">
@@ -152,9 +203,45 @@ export default function TransactionsPage() {
                                   <Badge variant="info" className="mt-1 text-xs">Recurring</Badge>
                                 )}
                               </div>
-                              <button className="p-2 rounded-lg hover:bg-white/10 transition-colors">
-                                <MoreHorizontal className="h-4 w-4 text-foreground-secondary" />
-                              </button>
+                              <div className="relative">
+                                <button 
+                                  className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setMenuOpenId(menuOpenId === transaction.id ? null : transaction.id);
+                                  }}
+                                >
+                                  <MoreHorizontal className="h-4 w-4 text-foreground-secondary" />
+                                </button>
+                                {menuOpenId === transaction.id && (
+                                  <div className="absolute right-0 top-full mt-1 w-40 bg-[#1a1a2e] border border-white/10 rounded-lg shadow-lg z-10 overflow-hidden">
+                                    <button
+                                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-white/10 transition-colors"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setMenuOpenId(null);
+                                        alert("Edit transaction - coming soon");
+                                      }}
+                                    >
+                                      <Pencil className="h-3.5 w-3.5" />
+                                      Edit
+                                    </button>
+                                    <button
+                                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-error hover:bg-white/10 transition-colors"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setMenuOpenId(null);
+                                        if (confirm("Are you sure you want to delete this transaction?")) {
+                                          deleteTransaction(transaction.id);
+                                        }
+                                      }}
+                                    >
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                      Delete
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         );
