@@ -20,6 +20,7 @@ import {
   Pencil,
   Trash2
 } from "lucide-react";
+import Link from "next/link";
 
 export default function AccountsPage() {
   const { accounts } = useAppStore();
@@ -39,10 +40,12 @@ export default function AccountsPage() {
               </div>
               <h1 className="text-2xl font-bold text-foreground mb-2">No Accounts Yet</h1>
               <p className="text-foreground-secondary mb-6">Add your first bank account to start tracking your finances.</p>
-              <Button onClick={() => alert("Add account form coming soon")}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Your First Account
-              </Button>
+              <Link href="/add-account">
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Your First Account
+                </Button>
+              </Link>
             </Card>
           </main>
         </div>
@@ -115,10 +118,12 @@ export default function AccountsPage() {
                 Manage and track all your financial accounts
               </p>
             </div>
-            <Button onClick={() => alert("Add account form coming soon")}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Account
-            </Button>
+            <Link href="/add-account">
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Account
+              </Button>
+            </Link>
           </div>
 
           {/* Net Worth Summary */}
@@ -296,15 +301,16 @@ export default function AccountsPage() {
               </div>
               <span className="text-sm font-medium text-foreground">Connect Bank</span>
             </button>
-            <button
-              className="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex flex-col items-center gap-2 text-center"
-              onClick={() => alert("Add account form coming soon")}
-            >
-              <div className="w-10 h-10 rounded-xl bg-success/20 flex items-center justify-center">
-                <Plus className="h-5 w-5 text-success" />
-              </div>
-              <span className="text-sm font-medium text-foreground">Add Manual</span>
-            </button>
+            <Link href="/add-account">
+              <button
+                className="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex flex-col items-center gap-2 text-center w-full"
+              >
+                <div className="w-10 h-10 rounded-xl bg-success/20 flex items-center justify-center">
+                  <Plus className="h-5 w-5 text-success" />
+                </div>
+                <span className="text-sm font-medium text-foreground">Add Manual</span>
+              </button>
+            </Link>
             <button
               className="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex flex-col items-center gap-2 text-center"
               onClick={() => alert("Sync feature coming soon")}

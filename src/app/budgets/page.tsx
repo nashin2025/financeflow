@@ -29,11 +29,11 @@ export default function BudgetsPage() {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   
   const handleCreateFirstBudget = () => {
-    alert("Budget creation form coming soon");
+    window.location.href = "/add-budget";
   };
 
   const handleAddBudgetCategory = () => {
-    alert("Budget creation form coming soon");
+    window.location.href = "/add-budget";
   };
 
   const handleEditBudget = (budgetName: string) => {
@@ -127,7 +127,7 @@ export default function BudgetsPage() {
                 })()}
               </p>
             </div>
-            <Link href="/add">
+            <Link href="/add-budget">
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Budget

@@ -42,10 +42,12 @@ export default function GoalsPage() {
               </div>
               <h1 className="text-2xl font-bold text-foreground mb-2">No Goals Yet</h1>
               <p className="text-foreground-secondary mb-6">Set financial goals to track your progress and stay motivated.</p>
-              <Button className="w-full" onClick={() => alert("Goal creation form coming soon")}>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Your First Goal
-              </Button>
+              <Link href="/add-goal">
+                <Button className="w-full">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Your First Goal
+                </Button>
+              </Link>
             </Card>
           </main>
         </div>
@@ -120,10 +122,12 @@ export default function GoalsPage() {
                 Track your progress toward your dreams
               </p>
             </div>
-            <Button onClick={() => alert("Goal creation form coming soon")}>
-              <Plus className="h-4 w-4 mr-2" />
-              New Goal
-            </Button>
+            <Link href="/add-goal">
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                New Goal
+              </Button>
+            </Link>
           </div>
 
           {/* Overall Summary */}
@@ -264,10 +268,12 @@ export default function GoalsPage() {
               })}
 
               {/* Add Goal Button */}
-              <button className="w-full p-5 rounded-xl border-2 border-dashed border-white/10 hover:border-primary-start/50 hover:bg-primary-start/5 transition-all flex items-center justify-center gap-2 text-foreground-secondary hover:text-primary-start" onClick={() => alert("Goal creation form coming soon")}>
-                <Plus className="h-5 w-5" />
-                <span className="font-medium">Create New Goal</span>
-              </button>
+              <Link href="/add-goal">
+                <button className="w-full p-5 rounded-xl border-2 border-dashed border-white/10 hover:border-primary-start/50 hover:bg-primary-start/5 transition-all flex items-center justify-center gap-2 text-foreground-secondary hover:text-primary-start">
+                  <Plus className="h-5 w-5" />
+                  <span className="font-medium">Create New Goal</span>
+                </button>
+              </Link>
             </CardContent>
           </Card>
 
