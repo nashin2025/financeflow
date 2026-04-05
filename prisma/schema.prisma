@@ -31,6 +31,7 @@ model User {
   goals               Goal[]
   notifications       Notification[]
   transactions        Transaction[]
+  loginSessions       LoginSession[]
 
   @@index([email])
 }
@@ -161,6 +162,19 @@ model Notification {
   @@index([userId])
   @@index([userId, isRead])
   @@index([userId, createdAt(sort: Desc)])
+}
+
+model LoginSession {
+  id        String   @id @default(cuid())
+  userId    String
+  loginAt   DateTime @default(now())
+  ipAddress String?  @db.VarChar(45)
+  userAgent String?  @db.VarChar(500)
+  location  String?  @db.VarChar(200)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, loginAt(sort: Desc)])
 }
 
 enum AccountType {

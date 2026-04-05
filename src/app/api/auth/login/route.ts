@@ -68,6 +68,15 @@ export async function POST(request: Request) {
 
     const refreshToken = await createRefreshJWT({ userId: user.id })
 
+    // Record login session (fire and forget)
+    prisma.loginSession.create({
+      data: {
+        userId: user.id,
+        ipAddress: ip === 'unknown' ? null : ip,
+        userAgent: request.headers.get('user-agent') || null,
+      },
+    }).catch(() => {})
+
     const response = NextResponse.json({
       user: {
         id: user.id,
