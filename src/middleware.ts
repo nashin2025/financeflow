@@ -47,6 +47,21 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // Check admin secret first (allows admin panel without JWT)
+  if (isAdminPath) {
+    const secret = request.nextUrl.searchParams.get('secret')
+    if (secret && secret === process.env.ADMIN_SECRET) {
+      const requestHeaders = new Headers(request.headers)
+      requestHeaders.set('x-user-id', 'admin')
+      requestHeaders.set('x-user-email', 'admin@financeflow.app')
+      requestHeaders.set('x-user-is-premium', 'true')
+      requestHeaders.set('x-user-is-admin', 'true')
+      return NextResponse.next({
+        request: { headers: requestHeaders },
+      })
+    }
+  }
+
   const accessToken = getCookie(request, '__Host-ff-access') || getCookie(request, 'ff-access')
 
   if (!accessToken) {
@@ -62,34 +77,6 @@ export async function middleware(request: NextRequest) {
     response.cookies.delete('ff-access')
     response.cookies.delete('ff-refresh')
     return response
-  }
-
-  if (isAdminPath) {
-    const secret = request.nextUrl.searchParams.get('secret')
-    if (secret && secret === process.env.ADMIN_SECRET) {
-      const requestHeaders = new Headers(request.headers)
-      requestHeaders.set('x-user-id', 'admin')
-      requestHeaders.set('x-user-email', 'admin@financeflow.app')
-      requestHeaders.set('x-user-is-premium', 'true')
-      requestHeaders.set('x-user-is-admin', 'true')
-      return NextResponse.next({
-        request: { headers: requestHeaders },
-      })
-    }
-  }
-
-  if (isAdminPath) {
-    const secret = request.nextUrl.searchParams.get('secret')
-    if (secret && secret === process.env.ADMIN_SECRET) {
-      const requestHeaders = new Headers(request.headers)
-      requestHeaders.set('x-user-id', 'admin')
-      requestHeaders.set('x-user-email', 'admin@financeflow.app')
-      requestHeaders.set('x-user-is-premium', 'true')
-      requestHeaders.set('x-user-is-admin', 'true')
-      return NextResponse.next({
-        request: { headers: requestHeaders },
-      })
-    }
   }
 
   if (isAdminPath && !payload.isAdmin) {
