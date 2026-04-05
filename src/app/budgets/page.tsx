@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { formatCurrency, formatPercentage, cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
+import { FREE_LIMITS } from "@/lib/features";
 import Link from "next/link";
 import { 
   Plus, 
@@ -21,18 +22,30 @@ import {
   MoreHorizontal,
   Calendar,
   ArrowLeft,
-  PiggyBank
+  PiggyBank,
+  Crown
 } from "lucide-react";
 
 export default function BudgetsPage() {
-  const { budgets, categories, transactions } = useAppStore();
+  const { budgets, categories, transactions, isPremium } = useAppStore();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [showUpgradeMsg, setShowUpgradeMsg] = useState(false);
+  
+  const remainingBudgets = isPremium ? Infinity : Math.max(0, FREE_LIMITS.budgets - budgets.length);
   
   const handleCreateFirstBudget = () => {
+    if (!isPremium && budgets.length >= FREE_LIMITS.budgets) {
+      setShowUpgradeMsg(true);
+      return;
+    }
     window.location.href = "/add-budget";
   };
 
   const handleAddBudgetCategory = () => {
+    if (!isPremium && budgets.length >= FREE_LIMITS.budgets) {
+      setShowUpgradeMsg(true);
+      return;
+    }
     window.location.href = "/add-budget";
   };
 
@@ -68,12 +81,39 @@ export default function BudgetsPage() {
             </Card>
           </main>
         </div>
-        <div className="lg:hidden">
-          <BottomNav />
-        </div>
+      <div className="lg:hidden">
+        <BottomNav />
       </div>
-    );
-  }
+
+      {/* Upgrade Modal */}
+      {showUpgradeMsg && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowUpgradeMsg(false)}
+          />
+          <div className="relative w-full max-w-md glass-elevated rounded-2xl p-6 animate-fadeIn">
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full bg-primary-start/20 flex items-center justify-center mx-auto mb-4">
+                <Crown className="h-8 w-8 text-primary-start" />
+              </div>
+              <h2 className="text-xl font-semibold text-foreground mb-2">Budget Limit Reached</h2>
+              <p className="text-foreground-secondary mb-4">
+                Free accounts can create up to {FREE_LIMITS.budgets} budgets. Upgrade to Premium for unlimited budgets.
+              </p>
+              <p className="text-sm text-foreground-tertiary mb-6">
+                Contact your administrator to request a premium upgrade.
+              </p>
+              <Button onClick={() => setShowUpgradeMsg(false)} className="w-full">
+                Got it
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
   
   const totalBudget = budgets.reduce((sum, b) => sum + b.amount, 0);
   const totalSpent = budgets.reduce((sum, b) => sum + b.spent, 0);
@@ -350,6 +390,33 @@ export default function BudgetsPage() {
       <div className="lg:hidden">
         <BottomNav />
       </div>
+
+      {/* Upgrade Modal */}
+      {showUpgradeMsg && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowUpgradeMsg(false)}
+          />
+          <div className="relative w-full max-w-md glass-elevated rounded-2xl p-6 animate-fadeIn">
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full bg-primary-start/20 flex items-center justify-center mx-auto mb-4">
+                <Crown className="h-8 w-8 text-primary-start" />
+              </div>
+              <h2 className="text-xl font-semibold text-foreground mb-2">Budget Limit Reached</h2>
+              <p className="text-foreground-secondary mb-4">
+                Free accounts can create up to {FREE_LIMITS.budgets} budgets. Upgrade to Premium for unlimited budgets.
+              </p>
+              <p className="text-sm text-foreground-tertiary mb-6">
+                Contact your administrator to request a premium upgrade.
+              </p>
+              <Button onClick={() => setShowUpgradeMsg(false)} className="w-full">
+                Got it
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

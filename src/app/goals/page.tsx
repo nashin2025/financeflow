@@ -10,6 +10,7 @@ import { Progress, ProgressRing } from "@/components/ui/progress";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { formatCurrency, cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
+import { FREE_LIMITS } from "@/lib/features";
 import Link from "next/link";
 import { 
   Plus, 
@@ -21,11 +22,21 @@ import {
   MoreHorizontal,
   CheckCircle,
   Pause,
-  Play
+  Play,
+  Crown
 } from "lucide-react";
 
 export default function GoalsPage() {
-  const { goals } = useAppStore();
+  const { goals, isPremium } = useAppStore();
+  const [showUpgradeMsg, setShowUpgradeMsg] = React.useState(false);
+  
+  const handleCreateGoal = () => {
+    if (!isPremium && goals.length >= FREE_LIMITS.goals) {
+      setShowUpgradeMsg(true);
+      return;
+    }
+    window.location.href = "/add-goal";
+  };
   
   if (goals.length === 0) {
     return (
@@ -42,21 +53,46 @@ export default function GoalsPage() {
               </div>
               <h1 className="text-2xl font-bold text-foreground mb-2">No Goals Yet</h1>
               <p className="text-foreground-secondary mb-6">Set financial goals to track your progress and stay motivated.</p>
-              <Link href="/add-goal">
-                <Button className="w-full">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Your First Goal
-                </Button>
-              </Link>
+              <Button className="w-full" onClick={handleCreateGoal}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Your First Goal
+              </Button>
             </Card>
           </main>
         </div>
-        <div className="lg:hidden">
-          <BottomNav />
-        </div>
+      <div className="lg:hidden">
+        <BottomNav />
       </div>
-    );
-  }
+
+      {/* Upgrade Modal */}
+      {showUpgradeMsg && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowUpgradeMsg(false)}
+          />
+          <div className="relative w-full max-w-md glass-elevated rounded-2xl p-6 animate-fadeIn">
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full bg-primary-start/20 flex items-center justify-center mx-auto mb-4">
+                <Crown className="h-8 w-8 text-primary-start" />
+              </div>
+              <h2 className="text-xl font-semibold text-foreground mb-2">Goal Limit Reached</h2>
+              <p className="text-foreground-secondary mb-4">
+                Free accounts can create up to {FREE_LIMITS.goals} goals. Upgrade to Premium for unlimited goals.
+              </p>
+              <p className="text-sm text-foreground-tertiary mb-6">
+                Contact your administrator to request a premium upgrade.
+              </p>
+              <Button onClick={() => setShowUpgradeMsg(false)} className="w-full">
+                Got it
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
   
   const activeGoals = goals.filter(g => g.status === "active");
   const completedGoals = goals.filter(g => g.status === "completed");
@@ -122,12 +158,10 @@ export default function GoalsPage() {
                 Track your progress toward your dreams
               </p>
             </div>
-            <Link href="/add-goal">
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                New Goal
-              </Button>
-            </Link>
+            <Button onClick={handleCreateGoal}>
+              <Plus className="h-4 w-4 mr-2" />
+              New Goal
+            </Button>
           </div>
 
           {/* Overall Summary */}
@@ -268,12 +302,13 @@ export default function GoalsPage() {
               })}
 
               {/* Add Goal Button */}
-              <Link href="/add-goal">
-                <button className="w-full p-5 rounded-xl border-2 border-dashed border-white/10 hover:border-primary-start/50 hover:bg-primary-start/5 transition-all flex items-center justify-center gap-2 text-foreground-secondary hover:text-primary-start">
-                  <Plus className="h-5 w-5" />
-                  <span className="font-medium">Create New Goal</span>
-                </button>
-              </Link>
+              <button 
+                className="w-full p-5 rounded-xl border-2 border-dashed border-white/10 hover:border-primary-start/50 hover:bg-primary-start/5 transition-all flex items-center justify-center gap-2 text-foreground-secondary hover:text-primary-start"
+                onClick={handleCreateGoal}
+              >
+                <Plus className="h-5 w-5" />
+                <span className="font-medium">Create New Goal</span>
+              </button>
             </CardContent>
           </Card>
 
@@ -353,6 +388,33 @@ export default function GoalsPage() {
       <div className="lg:hidden">
         <BottomNav />
       </div>
+
+      {/* Upgrade Modal */}
+      {showUpgradeMsg && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowUpgradeMsg(false)}
+          />
+          <div className="relative w-full max-w-md glass-elevated rounded-2xl p-6 animate-fadeIn">
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full bg-primary-start/20 flex items-center justify-center mx-auto mb-4">
+                <Crown className="h-8 w-8 text-primary-start" />
+              </div>
+              <h2 className="text-xl font-semibold text-foreground mb-2">Goal Limit Reached</h2>
+              <p className="text-foreground-secondary mb-4">
+                Free accounts can create up to {FREE_LIMITS.goals} goals. Upgrade to Premium for unlimited goals.
+              </p>
+              <p className="text-sm text-foreground-tertiary mb-6">
+                Contact your administrator to request a premium upgrade.
+              </p>
+              <Button onClick={() => setShowUpgradeMsg(false)} className="w-full">
+                Got it
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

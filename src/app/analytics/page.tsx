@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatCurrency, formatPercentage, cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
-import { 
+import { PremiumLock } from "@/components/premium-lock";
+import {
   TrendingUp, 
   TrendingDown,
   ArrowUpRight,
@@ -174,14 +175,18 @@ export default function AnalyticsPage() {
             </div>
             
             <div className="flex gap-2">
-              <Button variant="secondary" size="sm" onClick={() => alert("Filter options coming soon")}>
-                <Filter className="h-4 w-4 mr-2" />
-                Filter
-              </Button>
-              <Button variant="secondary" size="sm" onClick={handleExport}>
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
+              <PremiumLock feature="Advanced filtering and data export">
+                <Button variant="secondary" size="sm" onClick={() => alert("Filter options coming soon")}>
+                  <Filter className="h-4 w-4 mr-2" />
+                  Filter
+                </Button>
+              </PremiumLock>
+              <PremiumLock feature="Export your financial data">
+                <Button variant="secondary" size="sm" onClick={handleExport}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+              </PremiumLock>
             </div>
           </div>
 

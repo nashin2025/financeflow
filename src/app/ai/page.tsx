@@ -10,10 +10,11 @@ import { ProgressRing } from "@/components/ui/progress";
 import { useAppStore } from "@/stores/app-store";
 import { formatCurrency, cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { 
-  Send, 
-  Sparkles, 
-  TrendingDown, 
+import { PremiumLock } from "@/components/premium-lock";
+import {
+  Send,
+  Sparkles,
+  TrendingDown,
   TrendingUp,
   Lightbulb,
   Target,
@@ -108,7 +109,7 @@ export default function AIPage() {
     const q = question.toLowerCase();
 
     if (q.includes("coffee") || q.includes("starbucks")) {
-      const count = transactions.filter(t => 
+      const count = transactions.filter(t =>
         t.merchantName.toLowerCase().includes("starbucks") || t.tags.includes("coffee")
       ).length;
       return `You've spent ${formatCurrency(coffeeExpenses)} on coffee across ${count} transactions this month. That's about ${formatCurrency(coffeeExpenses / Math.max(count, 1))} per visit. Consider reducing this to save more!`;
@@ -188,7 +189,7 @@ export default function AIPage() {
 
     setTimeout(() => {
       const response = getAIResponse(input);
-      
+
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -241,207 +242,203 @@ export default function AIPage() {
 
       <div className="lg:pl-[240px]">
         <Header title="AI Assistant" showSearch={false} showNotifications />
-        
+
         <main className="p-4 lg:p-6 pb-20 lg:pb-6 space-y-6">
-          {/* Financial Health Score */}
-          {hasTransactions && (
-          <Card variant="glass" className="bg-gradient-to-r from-primary-start/10 to-primary-end/10 border-primary-start/20">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row md:items-center gap-6">
-                <div className="flex-shrink-0">
-                  <ProgressRing value={healthScore} size={100} strokeWidth={8}>
-                    <div className="text-center">
-                      <span className="text-2xl font-bold text-foreground">{healthScore}</span>
-                      <span className="text-xs text-foreground-tertiary">/100</span>
-                    </div>
-                  </ProgressRing>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Sparkles className="h-5 w-5 text-primary-start" />
-                    <h2 className="text-xl font-semibold text-foreground">Financial Health Score</h2>
-                  </div>
-                  <p className="text-foreground-secondary mb-4">
-                    Your overall financial health is <span className={healthScore >= 60 ? 'text-success font-medium' : 'text-warning font-medium'}>{healthScore >= 80 ? 'Excellent' : healthScore >= 60 ? 'Good' : healthScore >= 40 ? 'Fair' : healthScore >= 20 ? 'Needs Improvement' : 'Just Starting'}</span>. {healthScore >= 60 ? 'Keep making smart decisions!' : 'Start building better habits today.'}
-                  </p>
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    {[
-                      { label: "Savings", score: savingsScore },
-                      { label: "Budget", score: budgetScore },
-                      { label: "Debt", score: debtScore },
-                      { label: "Emergency", score: emergencyScore },
-                      { label: "Consistency", score: consistencyScore },
-                    ].map((item) => (
-                      <div key={item.label} className="text-center">
-                        <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden mb-1">
-                          <div 
-                            className={cn(
-                              "h-full rounded-full",
-                              item.score >= 70 ? "bg-success" : item.score >= 50 ? "bg-warning" : "bg-error"
-                            )}
-                            style={{ width: `${item.score}%` }}
-                          />
+          <PremiumLock feature="AI-powered financial insights and chat assistant">
+            {hasTransactions && (
+              <Card variant="glass" className="bg-gradient-to-r from-primary-start/10 to-primary-end/10 border-primary-start/20">
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row md:items-center gap-6">
+                    <div className="flex-shrink-0">
+                      <ProgressRing value={healthScore} size={100} strokeWidth={8}>
+                        <div className="text-center">
+                          <span className="text-2xl font-bold text-foreground">{healthScore}</span>
+                          <span className="text-xs text-foreground-tertiary">/100</span>
                         </div>
-                        <span className="text-xs text-foreground-tertiary">{item.label}</span>
+                      </ProgressRing>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Sparkles className="h-5 w-5 text-primary-start" />
+                        <h2 className="text-xl font-semibold text-foreground">Financial Health Score</h2>
+                      </div>
+                      <p className="text-foreground-secondary mb-4">
+                        Your overall financial health is <span className={healthScore >= 60 ? 'text-success font-medium' : 'text-warning font-medium'}>{healthScore >= 80 ? 'Excellent' : healthScore >= 60 ? 'Good' : healthScore >= 40 ? 'Fair' : healthScore >= 20 ? 'Needs Improvement' : 'Just Starting'}</span>. {healthScore >= 60 ? 'Keep making smart decisions!' : 'Start building better habits today.'}
+                      </p>
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        {[
+                          { label: "Savings", score: savingsScore },
+                          { label: "Budget", score: budgetScore },
+                          { label: "Debt", score: debtScore },
+                          { label: "Emergency", score: emergencyScore },
+                          { label: "Consistency", score: consistencyScore },
+                        ].map((item) => (
+                          <div key={item.label} className="text-center">
+                            <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden mb-1">
+                              <div
+                                className={cn(
+                                  "h-full rounded-full",
+                                  item.score >= 70 ? "bg-success" : item.score >= 50 ? "bg-warning" : "bg-error"
+                                )}
+                                style={{ width: `${item.score}%` }}
+                              />
+                            </div>
+                            <span className="text-xs text-foreground-tertiary">{item.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            <div className="grid lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-4">
+                <Card variant="glass" className="h-[500px] flex flex-col">
+                  <CardHeader className="flex-shrink-0">
+                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                      <MessageCircle className="h-5 w-5 text-primary-start" />
+                      Ask about your finances
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-1 overflow-y-auto space-y-4 pb-4">
+                    {messages.map((message) => (
+                      <div
+                        key={message.id}
+                        className={cn(
+                          "flex",
+                          message.role === "user" ? "justify-end" : "justify-start"
+                        )}
+                      >
+                        <div className={cn(
+                          "max-w-[80%] p-4 rounded-2xl",
+                          message.role === "user"
+                            ? "gradient-primary text-white"
+                            : "bg-white/10 text-foreground"
+                        )}>
+                          <p className="text-sm">{message.content}</p>
+                        </div>
                       </div>
                     ))}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          )}
-
-          <div className="grid lg:grid-cols-3 gap-6">
-            {/* Chat Interface */}
-            <div className="lg:col-span-2 space-y-4">
-              <Card variant="glass" className="h-[500px] flex flex-col">
-                <CardHeader className="flex-shrink-0">
-                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                    <MessageCircle className="h-5 w-5 text-primary-start" />
-                    Ask about your finances
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="flex-1 overflow-y-auto space-y-4 pb-4">
-                  {messages.map((message) => (
-                    <div 
-                      key={message.id}
-                      className={cn(
-                        "flex",
-                        message.role === "user" ? "justify-end" : "justify-start"
-                      )}
-                    >
-                      <div className={cn(
-                        "max-w-[80%] p-4 rounded-2xl",
-                        message.role === "user" 
-                          ? "gradient-primary text-white" 
-                          : "bg-white/10 text-foreground"
-                      )}>
-                        <p className="text-sm">{message.content}</p>
-                      </div>
-                    </div>
-                  ))}
-                  {isTyping && (
-                    <div className="flex justify-start">
-                      <div className="bg-white/10 p-4 rounded-2xl">
-                        <div className="flex gap-1">
-                          <span className="w-2 h-2 bg-foreground-tertiary rounded-full animate-bounce" />
-                          <span className="w-2 h-2 bg-foreground-tertiary rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
-                          <span className="w-2 h-2 bg-foreground-tertiary rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  <div ref={messagesEndRef} />
-                </CardContent>
-                <div className="flex-shrink-0 p-4 border-t border-white/5">
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                      placeholder="Ask about your finances..."
-                      className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-foreground placeholder:text-foreground-tertiary focus:outline-none focus:border-primary-start"
-                    />
-                    <Button onClick={handleSend} disabled={!input.trim() || isTyping}>
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Quick Questions */}
-              <div className="flex flex-wrap gap-2">
-                {quickQuestions.map((question) => (
-                  <button
-                    key={question}
-                    onClick={() => {
-                      setInput(question);
-                    }}
-                    className="px-4 py-2 rounded-xl bg-white/5 text-sm text-foreground-secondary hover:bg-white/10 transition-colors"
-                  >
-                    {question}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Insights Panel */}
-            <div className="space-y-4">
-              <Card variant="glass">
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-warning" />
-                    AI Insights
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {insights.map((insight, i) => (
-                    <div 
-                      key={i}
-                      className={cn(
-                        "p-4 rounded-xl",
-                        insight.type === "warning" && "bg-warning/10 border border-warning/20",
-                        insight.type === "success" && "bg-success/10 border border-success/20",
-                        insight.type === "tip" && "bg-info/10 border border-info/20"
-                      )}
-                    >
-                      <div className="flex items-start gap-3">
-                        <insight.icon className={cn(
-                          "h-5 w-5 mt-0.5",
-                          insight.type === "warning" && "text-warning",
-                          insight.type === "success" && "text-success",
-                          insight.type === "tip" && "text-info"
-                        )} />
-                        <div className="flex-1">
-                          <h4 className="font-medium text-foreground text-sm">{insight.title}</h4>
-                          <p className="text-xs text-foreground-secondary mt-1">{insight.description}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              <Card variant="glass">
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                    <Target className="h-5 w-5 text-success" />
-                    Goal Status
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {goals.filter(g => g.status === "active").slice(0, 3).map((goal) => {
-                    const progress = (goal.currentAmount / goal.targetAmount) * 100;
-                    return (
-                      <div key={goal.id} className="p-3 rounded-lg bg-white/5">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg">{goal.icon}</span>
-                            <span className="font-medium text-foreground text-sm">{goal.name}</span>
+                    {isTyping && (
+                      <div className="flex justify-start">
+                        <div className="bg-white/10 p-4 rounded-2xl">
+                          <div className="flex gap-1">
+                            <span className="w-2 h-2 bg-foreground-tertiary rounded-full animate-bounce" />
+                            <span className="w-2 h-2 bg-foreground-tertiary rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
+                            <span className="w-2 h-2 bg-foreground-tertiary rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
                           </div>
-                          <span className="text-xs text-foreground-secondary">{progress.toFixed(0)}%</span>
-                        </div>
-                        <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                          <div 
-                            className={cn(
-                              "h-full rounded-full",
-                              progress >= 75 ? "bg-success" : progress >= 50 ? "bg-warning" : "bg-primary-start"
-                            )}
-                            style={{ width: `${progress}%` }}
-                          />
                         </div>
                       </div>
-                    );
-                  })}
-                  <button onClick={() => router.push("/goals")} className="w-full p-3 rounded-lg text-sm text-primary-start hover:bg-white/5 transition-colors flex items-center justify-center gap-1">
-                    View all goals <ChevronRight className="h-4 w-4" />
-                  </button>
-                </CardContent>
-              </Card>
+                    )}
+                    <div ref={messagesEndRef} />
+                  </CardContent>
+                  <div className="flex-shrink-0 p-4 border-t border-white/5">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                        placeholder="Ask about your finances..."
+                        className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-foreground placeholder:text-foreground-tertiary focus:outline-none focus:border-primary-start"
+                      />
+                      <Button onClick={handleSend} disabled={!input.trim() || isTyping}>
+                        <Send className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+
+                <div className="flex flex-wrap gap-2">
+                  {quickQuestions.map((question) => (
+                    <button
+                      key={question}
+                      onClick={() => setInput(question)}
+                      className="px-4 py-2 rounded-xl bg-white/5 text-sm text-foreground-secondary hover:bg-white/10 transition-colors"
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <Card variant="glass">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                      <Zap className="h-5 w-5 text-warning" />
+                      AI Insights
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {insights.map((insight, i) => (
+                      <div
+                        key={i}
+                        className={cn(
+                          "p-4 rounded-xl",
+                          insight.type === "warning" && "bg-warning/10 border border-warning/20",
+                          insight.type === "success" && "bg-success/10 border border-success/20",
+                          insight.type === "tip" && "bg-info/10 border border-info/20"
+                        )}
+                      >
+                        <div className="flex items-start gap-3">
+                          <insight.icon className={cn(
+                            "h-5 w-5 mt-0.5",
+                            insight.type === "warning" && "text-warning",
+                            insight.type === "success" && "text-success",
+                            insight.type === "tip" && "text-info"
+                          )} />
+                          <div className="flex-1">
+                            <h4 className="font-medium text-foreground text-sm">{insight.title}</h4>
+                            <p className="text-xs text-foreground-secondary mt-1">{insight.description}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+
+                <Card variant="glass">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                      <Target className="h-5 w-5 text-success" />
+                      Goal Status
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {goals.filter(g => g.status === "active").slice(0, 3).map((goal) => {
+                      const progress = (goal.currentAmount / goal.targetAmount) * 100;
+                      return (
+                        <div key={goal.id} className="p-3 rounded-lg bg-white/5">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg">{goal.icon}</span>
+                              <span className="font-medium text-foreground text-sm">{goal.name}</span>
+                            </div>
+                            <span className="text-xs text-foreground-secondary">{progress.toFixed(0)}%</span>
+                          </div>
+                          <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <div
+                              className={cn(
+                                "h-full rounded-full",
+                                progress >= 75 ? "bg-success" : progress >= 50 ? "bg-warning" : "bg-primary-start"
+                              )}
+                              style={{ width: `${progress}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <button onClick={() => router.push("/goals")} className="w-full p-3 rounded-lg text-sm text-primary-start hover:bg-white/5 transition-colors flex items-center justify-center gap-1">
+                      View all goals <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
-          </div>
+          </PremiumLock>
         </main>
       </div>
 

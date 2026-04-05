@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/stores/app-store";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { PremiumLock } from "@/components/premium-lock";
 import { 
   User, 
   Bell, 
@@ -494,12 +495,16 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="divide-y divide-white/5">
-                <SettingsItem
-                  icon={<Download className="h-5 w-5" />}
-                  label="Export Data"
-                  description="Download your data as CSV"
-                  onClick={() => setShowExportModal(true)}
-                />
+                <PremiumLock feature="Export your financial data">
+                <PremiumLock feature="Export your financial data">
+                  <SettingsItem
+                    icon={<Download className="h-5 w-5" />}
+                    label="Export Data"
+                    description="Download your data as CSV"
+                    onClick={() => setShowExportModal(true)}
+                  />
+                </PremiumLock>
+                </PremiumLock>
                 <SettingsItem
                   icon={<Download className="h-5 w-5" />}
                   label="Import Transactions"
