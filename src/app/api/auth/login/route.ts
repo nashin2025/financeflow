@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import { createAccessJWT, createRefreshJWT, setAuthCookies, validateEmail, validatePassword } from '@/lib/auth'
 import { rateLimit } from '@/lib/rate-limit'
+import speakeasy from 'speakeasy'
 
 export async function POST(request: Request) {
   try {
@@ -13,7 +14,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { email, password } = body
+    const { email, password, twoFAToken } = body
 
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
@@ -36,6 +37,26 @@ export async function POST(request: Request) {
 
     if (!isValidPassword) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
+    }
+
+    if (user.twoFactorEnabled) {
+      if (!twoFAToken) {
+        return NextResponse.json({
+          requires2FA: true,
+          userId: user.id,
+        })
+      }
+
+      const verified = speakeasy.totp.verify({
+        secret: user.twoFactorSecret!,
+        encoding: 'base32',
+        token: twoFAToken,
+        window: 2,
+      })
+
+      if (!verified) {
+        return NextResponse.json({ error: 'Invalid verification code' }, { status: 401 })
+      }
     }
 
     const accessToken = await createAccessJWT({

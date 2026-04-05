@@ -1,12 +1,20 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { getHeaders } from '@/lib/auth'
 
 export async function GET(request: Request) {
   try {
+    const headers = getHeaders(request)
+    const userId = headers.get('x-user-id')
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const { searchParams } = new URL(request.url)
     const isActive = searchParams.get('isActive')
 
-    const where: Record<string, unknown> = {}
+    const where: Record<string, unknown> = { userId }
     if (isActive !== null) where.isActive = isActive === 'true'
 
     const budgets = await prisma.budget.findMany({
@@ -26,8 +34,15 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const headers = getHeaders(request)
+    const userId = headers.get('x-user-id')
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await request.json()
-    const { name, amount, period, categoryId, startDate, rollover, alertThreshold, userId } = body
+    const { name, amount, period, categoryId, startDate, rollover, alertThreshold } = body
 
     if (!name || !amount) {
       return NextResponse.json({ error: 'Name and amount are required' }, { status: 400 })
@@ -42,7 +57,7 @@ export async function POST(request: Request) {
         startDate: startDate ? new Date(startDate) : null,
         rollover: rollover || false,
         alertThreshold: alertThreshold || 75,
-        userId: userId || '1',
+        userId,
       },
       include: {
         category: { select: { id: true, name: true, icon: true, color: true } },

@@ -100,30 +100,84 @@ export default function SettingsPage() {
     setShowUpgradeMsg(true);
   };
 
-  const handleExport = (format: string) => {
-    const { transactions } = useAppStore.getState();
-    if (format === "csv") {
-      const csvContent = [
-        "Type,Amount,Description,Date",
-        ...transactions.map(t => `${t.type},${t.amount},"${t.description || ""}",${t.date}`),
-      ].join("\n");
-      const blob = new Blob([csvContent], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "financeflow_export.csv";
-      a.click();
+  const handleExport = async (format: string) => {
+    try {
+      const res = await fetch(`/api/export?format=${format}`);
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `financeflow_export_${new Date().toISOString().split("T")[0]}.${format}`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch {
+      alert("Export failed. Please try again.");
     }
     setShowExportModal(false);
   };
 
-  const handleImport = () => {
-    alert("Import functionality coming soon!");
+  const handleImport = async (file: File) => {
+    try {
+      const text = await file.text();
+      const lines = text.split("\n").filter(l => l.trim());
+      if (lines.length < 2) {
+        alert("File is empty or has no data rows");
+        return;
+      }
+      const headers = lines[0].split(",").map(h => h.trim().replace(/"/g, ""));
+      const transactions = lines.slice(1).map(line => {
+        const values = line.split(",").map(v => v.trim().replace(/"/g, ""));
+        const row: any = {};
+        headers.forEach((h, i) => { row[h.toLowerCase()] = values[i] || ""; });
+        return {
+          type: row.type || "expense",
+          amount: parseFloat(row.amount) || 0,
+          date: row.date || new Date().toISOString().split("T")[0],
+          description: row.description || row.merchant || "",
+          merchantName: row.merchant || row.merchantName || "",
+          note: row.note || "",
+          currency: row.currency || "MVR",
+          tags: row.tags ? row.tags.split(";").filter(Boolean) : [],
+        };
+      });
+
+      const res = await fetch("/api/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transactions }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert(`Imported ${data.imported} transactions. ${data.duplicates} duplicates skipped. ${data.errors.length} errors.`);
+      } else {
+        alert(data.error || "Import failed");
+      }
+    } catch {
+      alert("Import failed. Please check your file format.");
+    }
     setShowImportModal(false);
   };
 
-  const handleDeleteAccount = () => {
-    alert("Account deletion would require admin approval. Contact support.");
+  const handleDeleteAccount = async () => {
+    try {
+      const res = await fetch("/api/me", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmDelete: "DELETE" }),
+      });
+      if (res.ok) {
+        logout();
+        router.push("/");
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to delete account");
+      }
+    } catch {
+      alert("Failed to delete account");
+    }
     setShowDeleteModal(false);
   };
 
@@ -218,7 +272,7 @@ export default function SettingsPage() {
                     )}
                   </div>
                 </div>
-                <Button variant="secondary" size="sm" onClick={() => alert("Edit profile coming soon")}>
+                <Button variant="secondary" size="sm" onClick={() => router.push("/profile")}>
                   Edit Profile
                 </Button>
               </div>
@@ -429,29 +483,13 @@ export default function SettingsPage() {
                   description="Update your account password"
                   onClick={() => setShowPasswordModal(true)}
                 />
-                <div className="flex items-center justify-between p-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-                      <Shield className="h-5 w-5 text-foreground-secondary" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">Two-Factor Authentication</p>
-                      <p className="text-sm text-foreground-tertiary">Add an extra layer of security</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setSecurity({ twoFactor: !security.twoFactor })}
-                    className={cn(
-                      "w-12 h-6 rounded-full transition-colors relative",
-                      security.twoFactor ? "bg-primary-start" : "bg-white/20"
-                    )}
-                  >
-                    <span className={cn(
-                      "absolute top-1 w-4 h-4 rounded-full bg-white transition-transform",
-                      security.twoFactor ? "left-7" : "left-1"
-                    )} />
-                  </button>
-                </div>
+                <SettingsItem
+                  icon={<Shield className="h-5 w-5" />}
+                  label="Two-Factor Authentication"
+                  description="Add an extra layer of security"
+                  value={security.twoFactor ? "Enabled" : "Disabled"}
+                  onClick={() => router.push("/two-factor")}
+                />
                 <div className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">

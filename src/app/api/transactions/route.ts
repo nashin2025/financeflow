@@ -1,8 +1,16 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { getHeaders } from '@/lib/auth'
 
 export async function GET(request: Request) {
   try {
+    const headers = getHeaders(request)
+    const userId = headers.get('x-user-id')
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const { searchParams } = new URL(request.url)
     const type = searchParams.get('type')
     const accountId = searchParams.get('accountId')
@@ -10,7 +18,7 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get('limit') || '50')
     const offset = parseInt(searchParams.get('offset') || '0')
 
-    const where: Record<string, unknown> = {}
+    const where: Record<string, unknown> = { userId }
 
     if (type) where.type = type
     if (accountId) where.accountId = accountId
@@ -38,8 +46,15 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const headers = getHeaders(request)
+    const userId = headers.get('x-user-id')
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await request.json()
-    const { type, amount, currency, description, merchantName, date, note, accountId, categoryId, isRecurring, isExcluded, tags, userId } = body
+    const { type, amount, currency, description, merchantName, date, note, accountId, categoryId, isRecurring, isExcluded, tags } = body
 
     if (!type || !amount || !date) {
       return NextResponse.json({ error: 'Type, amount, and date are required' }, { status: 400 })
@@ -59,7 +74,7 @@ export async function POST(request: Request) {
         isRecurring: isRecurring || false,
         isExcluded: isExcluded || false,
         tags: tags ? JSON.stringify(tags) : '[]',
-        userId: userId || '1',
+        userId,
       },
       include: {
         account: { select: { id: true, name: true, type: true } },

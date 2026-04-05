@@ -143,3 +143,7 @@ export function validateEmail(email: string): string | null {
   }
   return null
 }
+
+export function getHeaders(request: Request): Headers {
+  return request.headers
+}

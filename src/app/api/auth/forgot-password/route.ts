@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma'
 import { validateEmail } from '@/lib/auth'
 import { rateLimit } from '@/lib/rate-limit'
 import crypto from 'crypto'
+import { sendEmail, resetPasswordEmail } from '@/lib/email'
 
 export async function POST(request: Request) {
   try {
@@ -43,9 +44,9 @@ export async function POST(request: Request) {
       }
     })
 
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`
-
-    console.log(`Password reset URL for ${user.email}: ${resetUrl}`)
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const emailData = resetPasswordEmail(user.name || '', resetToken, baseUrl)
+    await sendEmail(user.email, emailData.subject, emailData.html)
 
     return NextResponse.json({ message: 'If an account exists with that email, a reset link has been sent.' })
   } catch (error) {

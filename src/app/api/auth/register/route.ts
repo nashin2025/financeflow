@@ -3,6 +3,8 @@ import prisma from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import { createAccessJWT, createRefreshJWT, validateEmail, validatePassword } from '@/lib/auth'
 import { rateLimit } from '@/lib/rate-limit'
+import { sendEmail, verificationEmail } from '@/lib/email'
+import crypto from 'crypto'
 
 export async function POST(request: Request) {
   try {
@@ -38,12 +40,16 @@ export async function POST(request: Request) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 12)
+    const verificationToken = crypto.randomBytes(32).toString('hex')
+    const verificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000)
 
     const user = await prisma.user.create({
       data: {
         email: email.toLowerCase(),
         name: name?.trim() || email.split('@')[0],
         password: hashedPassword,
+        emailVerificationToken: verificationToken,
+        emailVerificationExpiry: verificationExpiry,
       },
       select: {
         id: true,
@@ -52,6 +58,10 @@ export async function POST(request: Request) {
         isPremium: true,
       }
     })
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const emailData = verificationEmail(user.name || '', verificationToken, baseUrl)
+    await sendEmail(user.email, emailData.subject, emailData.html)
 
     const accessToken = await createAccessJWT({
       userId: user.id,
@@ -62,7 +72,11 @@ export async function POST(request: Request) {
 
     const refreshToken = await createRefreshJWT({ userId: user.id })
 
-    const response = NextResponse.json({ user, message: 'User created successfully' })
+    const response = NextResponse.json({ 
+      user, 
+      message: 'User created successfully. Please check your email to verify your account.',
+      requiresVerification: true,
+    })
     await setAuthCookiesOnResponse(response, accessToken, refreshToken)
 
     return response
