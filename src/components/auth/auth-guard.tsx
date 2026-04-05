@@ -9,7 +9,7 @@ const publicPaths = ["/login", "/signup", "/forgot-password", "/reset-password"]
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { setUser, logout, isAuthenticated } = useAppStore();
+  const { setUser, setPremium, logout, isAuthenticated } = useAppStore();
   const [isChecking, setIsChecking] = React.useState(true);
   const hasCheckedRef = React.useRef(false);
 
@@ -28,6 +28,8 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
             email: data.user.email,
             name: data.user.name,
           });
+          setPremium(data.user.isPremium ?? false);
+          setPremium(data.user.isPremium ?? false);
 
           if (publicPaths.includes(pathname)) {
             router.replace("/");

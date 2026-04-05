@@ -89,10 +89,6 @@ export default function AdminPage() {
         setUsers(prev => prev.map(u => 
           u.id === userId ? { ...u, isPremium: data.user.isPremium } : u
         ));
-        
-        if (userId === "1") {
-          setPremium(data.user.isPremium);
-        }
       } else {
         setError(data.error || "Failed to update user");
       }
