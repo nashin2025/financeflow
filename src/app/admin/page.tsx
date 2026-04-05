@@ -75,6 +75,7 @@ export default function AdminPage() {
 
   const togglePremium = async (userId: string, currentPremium: boolean) => {
     setLoading(true);
+    setError("");
     try {
       const res = await fetch(`/api/users/${userId}?secret=${adminSecret}`, {
         method: 'PUT',
@@ -82,19 +83,21 @@ export default function AdminPage() {
         body: JSON.stringify({ userId, isPremium: !currentPremium })
       });
       
+      const data = await res.json();
+      
       if (res.ok) {
-        const data = await res.json();
         setUsers(prev => prev.map(u => 
           u.id === userId ? { ...u, isPremium: data.user.isPremium } : u
         ));
         
-        // Update current user if it's the logged-in user
         if (userId === "1") {
           setPremium(data.user.isPremium);
         }
+      } else {
+        setError(data.error || "Failed to update user");
       }
     } catch (err) {
-      console.error("Failed to update user:", err);
+      setError("Failed to connect to server");
     } finally {
       setLoading(false);
     }
@@ -173,6 +176,11 @@ export default function AdminPage() {
         <Header title="Admin Panel" showSearch={false} showNotifications={false} />
         
         <main className="p-4 lg:p-6 pb-20 lg:pb-6 space-y-6">
+          {error && (
+            <div className="p-3 rounded-lg bg-error/10 border border-error/20 text-sm text-error">
+              {error}
+            </div>
+          )}
           {/* Admin Header */}
           <Card variant="glass" className="bg-gradient-to-r from-warning/10 to-warning/5 border-warning/20">
             <CardContent className="p-6">
