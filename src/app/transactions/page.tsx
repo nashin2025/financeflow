@@ -12,15 +12,16 @@ import { formatCurrency } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
 import { 
   Search, 
-  Filter, 
   Plus, 
   ChevronDown,
   ChevronUp,
-  Calendar,
-  ArrowUpDown,
   MoreHorizontal,
   Pencil,
-  Trash2
+  Trash2,
+  CheckSquare,
+  Square,
+  X,
+  Trash
 } from "lucide-react";
 import Link from "next/link";
 
@@ -35,6 +36,8 @@ export default function TransactionsPage() {
   const [sortBy, setSortBy] = React.useState<SortOption>("date");
   const [sortOrder, setSortOrder] = React.useState<Order>("desc");
   const [expandedDate, setExpandedDate] = React.useState<string | null>(null);
+  const [selectionMode, setSelectionMode] = React.useState(false);
+  const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
 
   const getCategoryInfo = (categoryId: string) => {
     const category = categories.find(c => c.id === categoryId);
@@ -84,6 +87,35 @@ export default function TransactionsPage() {
       }));
   }, [filteredTransactions]);
 
+  const toggleSelection = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const selectAll = () => {
+    const allIds = filteredTransactions.map(t => t.id);
+    setSelectedIds(allIds);
+  };
+
+  const deselectAll = () => {
+    setSelectedIds([]);
+  };
+
+  const bulkDelete = () => {
+    if (selectedIds.length === 0) return;
+    if (confirm(`Delete ${selectedIds.length} transaction(s)?`)) {
+      selectedIds.forEach(id => deleteTransaction(id));
+      setSelectedIds([]);
+      setSelectionMode(false);
+    }
+  };
+
+  const toggleSelectionMode = () => {
+    setSelectionMode(prev => !prev);
+    setSelectedIds([]);
+  };
+
   return (
     <div className="min-h-screen">
       <div className="hidden lg:block">
@@ -105,12 +137,22 @@ export default function TransactionsPage() {
                   icon={<Search className="h-4 w-4" />}
                 />
               </div>
-              <Link href="/add">
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Transaction
+              <div className="flex gap-2">
+                <Button variant="secondary" onClick={toggleSelectionMode}>
+                  {selectionMode ? (
+                    <X className="h-4 w-4 mr-2" />
+                  ) : (
+                    <CheckSquare className="h-4 w-4 mr-2" />
+                  )}
+                  {selectionMode ? "Cancel" : "Select"}
                 </Button>
-              </Link>
+                <Link href="/add">
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Transaction
+                  </Button>
+                </Link>
+              </div>
             </div>
 
             {/* Filter Tabs */}
@@ -128,6 +170,19 @@ export default function TransactionsPage() {
                   {type.charAt(0).toUpperCase() + type.slice(1)}
                 </button>
               ))}
+              {selectionMode && (
+                <div className="ml-auto flex items-center gap-2">
+                  <button
+                    onClick={selectedIds.length === filteredTransactions.length ? deselectAll : selectAll}
+                    className="px-3 py-2 rounded-lg text-sm text-primary-start hover:bg-white/5 transition-colors"
+                  >
+                    {selectedIds.length === filteredTransactions.length ? "Deselect All" : "Select All"}
+                  </button>
+                  <span className="text-sm text-foreground-tertiary">
+                    {selectedIds.length} selected
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -168,13 +223,32 @@ export default function TransactionsPage() {
                       {group.transactions.map((transaction) => {
                         const category = getCategoryInfo(transaction.categoryId);
                         const isExpense = transaction.type === "expense";
+                        const isSelected = selectedIds.includes(transaction.id);
                         
                         return (
                           <div 
                             key={transaction.id}
-                            className="flex items-center justify-between p-4 hover:bg-white/5 transition-colors cursor-pointer"
+                            className={cn(
+                              "flex items-center justify-between p-4 hover:bg-white/5 transition-colors",
+                              isSelected && "bg-primary/10"
+                            )}
                           >
                             <div className="flex items-center gap-4">
+                              {selectionMode && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleSelection(transaction.id);
+                                  }}
+                                  className="flex-shrink-0"
+                                >
+                                  {isSelected ? (
+                                    <CheckSquare className="h-5 w-5 text-primary-start" />
+                                  ) : (
+                                    <Square className="h-5 w-5 text-foreground-tertiary" />
+                                  )}
+                                </button>
+                              )}
                               <div 
                                 className="w-12 h-12 rounded-xl flex items-center justify-center text-xl"
                                 style={{ backgroundColor: `${category.color}20` }}
@@ -203,45 +277,47 @@ export default function TransactionsPage() {
                                   <Badge variant="info" className="mt-1 text-xs">Recurring</Badge>
                                 )}
                               </div>
-                              <div className="relative">
-                                <button 
-                                  className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setMenuOpenId(menuOpenId === transaction.id ? null : transaction.id);
-                                  }}
-                                >
-                                  <MoreHorizontal className="h-4 w-4 text-foreground-secondary" />
-                                </button>
-                                {menuOpenId === transaction.id && (
-                                  <div className="absolute right-0 top-full mt-1 w-40 bg-[#1a1a2e] border border-white/10 rounded-lg shadow-lg z-10 overflow-hidden">
-                                    <button
-                                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-white/10 transition-colors"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setMenuOpenId(null);
-                                        alert("Edit transaction - coming soon");
-                                      }}
-                                    >
-                                      <Pencil className="h-3.5 w-3.5" />
-                                      Edit
-                                    </button>
-                                    <button
-                                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-error hover:bg-white/10 transition-colors"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setMenuOpenId(null);
-                                        if (confirm("Are you sure you want to delete this transaction?")) {
-                                          deleteTransaction(transaction.id);
-                                        }
-                                      }}
-                                    >
-                                      <Trash2 className="h-3.5 w-3.5" />
-                                      Delete
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
+                              {!selectionMode && (
+                                <div className="relative">
+                                  <button 
+                                    className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setMenuOpenId(menuOpenId === transaction.id ? null : transaction.id);
+                                    }}
+                                  >
+                                    <MoreHorizontal className="h-4 w-4 text-foreground-secondary" />
+                                  </button>
+                                  {menuOpenId === transaction.id && (
+                                    <div className="absolute right-0 top-full mt-1 w-40 bg-[#1a1a2e] border border-white/10 rounded-lg shadow-lg z-10 overflow-hidden">
+                                      <button
+                                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-white/10 transition-colors"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setMenuOpenId(null);
+                                          alert("Edit transaction - coming soon");
+                                        }}
+                                      >
+                                        <Pencil className="h-3.5 w-3.5" />
+                                        Edit
+                                      </button>
+                                      <button
+                                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-error hover:bg-white/10 transition-colors"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setMenuOpenId(null);
+                                          if (confirm("Are you sure you want to delete this transaction?")) {
+                                            deleteTransaction(transaction.id);
+                                          }
+                                        }}
+                                      >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                        Delete
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           </div>
                         );
@@ -273,6 +349,25 @@ export default function TransactionsPage() {
             )}
           </div>
         </main>
+
+        {/* Bulk Action Bar */}
+        {selectionMode && selectedIds.length > 0 && (
+          <div className="fixed bottom-20 lg:bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slideUp">
+            <Card variant="elevated" className="px-6 py-3 flex items-center gap-4 shadow-2xl border-white/10 bg-dark-100">
+              <span className="text-sm text-foreground-secondary font-medium">
+                {selectedIds.length} selected
+              </span>
+              <div className="h-4 w-px bg-white/10" />
+              <Button variant="ghost" size="sm" onClick={deselectAll}>
+                Deselect
+              </Button>
+              <Button variant="danger" size="sm" onClick={bulkDelete}>
+                <Trash className="h-4 w-4 mr-1" />
+                Delete
+              </Button>
+            </Card>
+          </div>
+        )}
       </div>
 
       <div className="lg:hidden">
@@ -280,4 +375,8 @@ export default function TransactionsPage() {
       </div>
     </div>
   );
+}
+
+function cn(...classes: (string | boolean | undefined | null)[]) {
+  return classes.filter(Boolean).join(" ");
 }

@@ -11,6 +11,7 @@ import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { formatCurrency, cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
 import { FREE_LIMITS } from "@/lib/features";
+import { GoalCelebration, checkGoalMilestone } from "@/components/goal-celebration";
 import Link from "next/link";
 import { 
   Plus, 
@@ -29,7 +30,18 @@ import {
 export default function GoalsPage() {
   const { goals, isPremium } = useAppStore();
   const [showUpgradeMsg, setShowUpgradeMsg] = React.useState(false);
-  
+  const [celebration, setCelebration] = React.useState<{ goalName: string; milestone: number } | null>(null);
+
+  // Check for goal milestones
+  React.useEffect(() => {
+    goals.forEach(goal => {
+      const milestone = checkGoalMilestone(goal.id, goal.currentAmount, goal.targetAmount);
+      if (milestone) {
+        setCelebration({ goalName: goal.name, milestone });
+      }
+    });
+  }, [goals]);
+
   const handleCreateGoal = () => {
     if (!isPremium && goals.length >= FREE_LIMITS.goals) {
       setShowUpgradeMsg(true);
@@ -58,11 +70,22 @@ export default function GoalsPage() {
                 Create Your First Goal
               </Button>
             </Card>
-          </main>
-        </div>
+        </main>
+      </div>
+
       <div className="lg:hidden">
         <BottomNav />
       </div>
+
+      {/* Goal Celebration */}
+      {celebration && (
+        <GoalCelebration
+          goalName={celebration.goalName}
+          milestone={celebration.milestone}
+          isOpen={!!celebration}
+          onClose={() => setCelebration(null)}
+        />
+      )}
 
       {/* Upgrade Modal */}
       {showUpgradeMsg && (
@@ -93,7 +116,6 @@ export default function GoalsPage() {
     </div>
   );
 }
-  
   const activeGoals = goals.filter(g => g.status === "active");
   const completedGoals = goals.filter(g => g.status === "completed");
   
@@ -388,6 +410,16 @@ export default function GoalsPage() {
       <div className="lg:hidden">
         <BottomNav />
       </div>
+
+      {/* Goal Celebration */}
+      {celebration && (
+        <GoalCelebration
+          goalName={celebration.goalName}
+          milestone={celebration.milestone}
+          isOpen={!!celebration}
+          onClose={() => setCelebration(null)}
+        />
+      )}
 
       {/* Upgrade Modal */}
       {showUpgradeMsg && (

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { formatCurrency, formatPercentage, cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
 import { PremiumLock } from "@/components/premium-lock";
+import { SpendingHeatmap } from "@/components/spending-heatmap";
 import {
   TrendingUp, 
   TrendingDown,
@@ -414,6 +415,76 @@ export default function AnalyticsPage() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Spending Heatmap */}
+              <SpendingHeatmap transactions={transactions} />
+
+              {/* Budget vs Actual */}
+              {budgets.length > 0 && (
+                <Card variant="glass">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold">Budget vs Actual</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {budgets.filter(b => b.isActive).map((budget) => {
+                        const category = getCategoryInfo(budget.categoryId);
+                        const percentage = budget.amount > 0 ? (budget.spent / budget.amount) * 100 : 0;
+                        const isOver = percentage > 100;
+                        const maxVal = Math.max(budget.amount, budget.spent);
+                        
+                        return (
+                          <div key={budget.id} className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span>{category.icon}</span>
+                                <span className="text-sm font-medium text-foreground">{budget.name}</span>
+                              </div>
+                              <span className={`text-xs font-mono ${isOver ? 'text-error' : 'text-foreground-tertiary'}`}>
+                                {percentage.toFixed(0)}%
+                              </span>
+                            </div>
+                            <div className="flex gap-1 h-6">
+                              {/* Budgeted bar */}
+                              <div 
+                                className="bg-primary/30 rounded-l-full transition-all"
+                                style={{ width: `${(budget.amount / maxVal) * 100}%` }}
+                                title={`Budgeted: ${formatCurrency(budget.amount)}`}
+                              />
+                              {/* Actual spent bar */}
+                              <div 
+                                className={cn(
+                                  "rounded-r-full transition-all",
+                                  isOver ? "bg-error" : "bg-primary"
+                                )}
+                                style={{ width: `${(budget.spent / maxVal) * 100}%` }}
+                                title={`Spent: ${formatCurrency(budget.spent)}`}
+                              />
+                            </div>
+                            <div className="flex items-center justify-between text-xs text-foreground-tertiary">
+                              <div className="flex items-center gap-3">
+                                <span className="flex items-center gap-1">
+                                  <span className="w-2 h-2 rounded-full bg-primary/30" />
+                                  Budget: {formatCurrency(budget.amount)}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <span className={cn("w-2 h-2 rounded-full", isOver ? "bg-error" : "bg-primary")} />
+                                  Spent: {formatCurrency(budget.spent)}
+                                </span>
+                              </div>
+                              {isOver && (
+                                <span className="text-error">
+                                  Over by {formatCurrency(budget.spent - budget.amount)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </>
           )}
 

@@ -18,9 +18,13 @@ import {
   ArrowRight,
   Wallet,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  TrendingUp,
+  TrendingDown
 } from "lucide-react";
 import Link from "next/link";
+import { AnimatedCounter } from "@/components/ui/animated-counter";
+import { DashboardEmptyState } from "@/components/dashboard-empty-state";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -182,6 +186,13 @@ export default function DashboardPage() {
         <Header title="Dashboard" showSearch showNotifications />
         
         <main className="p-4 lg:p-6 pb-20 lg:pb-6 space-y-6">
+          {/* Empty State for New Users */}
+          <DashboardEmptyState 
+            hasTransactions={transactions.length > 0}
+            hasBudgets={budgets.length > 0}
+            hasGoals={goals.length > 0}
+          />
+
           {/* Welcome Section */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
@@ -218,7 +229,7 @@ export default function DashboardPage() {
                   <div>
                     <p className="text-sm text-foreground-secondary">Total Balance</p>
                     <p className="text-xl lg:text-2xl font-bold text-foreground mt-1 font-mono">
-                      {formatCurrency(totalBalance)}
+                      <AnimatedCounter value={totalBalance} />
                     </p>
                   </div>
                   <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
@@ -247,7 +258,7 @@ export default function DashboardPage() {
                   <div>
                     <p className="text-sm text-foreground-secondary">Income</p>
                     <p className="text-xl lg:text-2xl font-bold text-success mt-1 font-mono">
-                      {formatCurrency(totalIncome)}
+                      <AnimatedCounter value={totalIncome} />
                     </p>
                   </div>
                   <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
@@ -349,6 +360,16 @@ export default function DashboardPage() {
                   const isOver = percentage > 100;
                   const isWarning = percentage > 75;
                   
+                  // Budget pace calculation
+                  const daysInMonth = new Date().getDate();
+                  const totalDaysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+                  const dailyBudget = budget.amount / totalDaysInMonth;
+                  const idealSpent = dailyBudget * daysInMonth;
+                  const paceDiff = budget.spent - idealSpent;
+                  const isOverPace = paceDiff > 0;
+                  const projectedTotal = dailyBudget > 0 ? (budget.spent / dailyBudget) * dailyBudget * (totalDaysInMonth / daysInMonth) : 0;
+                  const projectedMonthEnd = budget.amount > 0 ? (budget.spent / budget.amount) * budget.amount * (totalDaysInMonth / daysInMonth) : 0;
+                  
                   return (
                     <div key={budget.id} className="space-y-2">
                       <div className="flex items-center justify-between">
@@ -368,6 +389,24 @@ export default function DashboardPage() {
                       <div className="flex items-center justify-between text-xs text-foreground-tertiary">
                         <span>{percentage.toFixed(0)}% spent</span>
                         <span>{formatCurrency(budget.remaining)} remaining</span>
+                      </div>
+                      {/* Budget pace tracker */}
+                      <div className={`flex items-center gap-1 text-xs ${isOverPace ? 'text-error' : 'text-success'}`}>
+                        {isOverPace ? (
+                          <TrendingUp className="h-3 w-3" />
+                        ) : (
+                          <TrendingDown className="h-3 w-3" />
+                        )}
+                        <span>
+                          {isOverPace 
+                            ? `↑ ${formatCurrency(paceDiff)} over daily pace` 
+                            : `↓ ${formatCurrency(Math.abs(paceDiff))} under daily pace`
+                          }
+                        </span>
+                        <span className="text-foreground-disabled">•</span>
+                        <span>
+                          Projected: {formatCurrency(budget.spent > 0 && daysInMonth > 0 ? (budget.spent / daysInMonth) * totalDaysInMonth : 0)} by month end
+                        </span>
                       </div>
                     </div>
                   );
