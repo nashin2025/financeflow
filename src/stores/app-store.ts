@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { Transaction, Account, Budget, Goal, Category } from "@/types";
+import { recalculateBudgetSpent, recalculateAccountBalances } from "@/lib/data-consistency";
 
 const STORAGE_KEY = "financeflow_state";
 
@@ -189,25 +190,56 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   
   setTransactions: (transactions) => {
-    set({ transactions });
+    set((state) => {
+      const updatedBudgets = recalculateBudgetSpent(state.budgets, transactions, state.categories);
+      const updatedAccounts = recalculateAccountBalances(state.accounts, transactions);
+      return {
+        transactions,
+        budgets: updatedBudgets,
+        accounts: updatedAccounts
+      };
+    });
     saveToStorage(get());
   },
   addTransaction: (transaction) => {
-    set((state) => ({ transactions: [transaction, ...state.transactions] }));
+    set((state) => {
+      const newTransactions = [transaction, ...state.transactions];
+      const updatedBudgets = recalculateBudgetSpent(state.budgets, newTransactions, state.categories);
+      const updatedAccounts = recalculateAccountBalances(state.accounts, newTransactions);
+      return {
+        transactions: newTransactions,
+        budgets: updatedBudgets,
+        accounts: updatedAccounts
+      };
+    });
     saveToStorage(get());
   },
   updateTransaction: (id, data) => {
-    set((state) => ({
-      transactions: state.transactions.map((t) => 
+    set((state) => {
+      const updatedTransactions = state.transactions.map((t) =>
         t.id === id ? { ...t, ...data } : t
-      )
-    }));
+      );
+      const updatedBudgets = recalculateBudgetSpent(state.budgets, updatedTransactions, state.categories);
+      const updatedAccounts = recalculateAccountBalances(state.accounts, updatedTransactions);
+      return {
+        transactions: updatedTransactions,
+        budgets: updatedBudgets,
+        accounts: updatedAccounts
+      };
+    });
     saveToStorage(get());
   },
   deleteTransaction: (id) => {
-    set((state) => ({
-      transactions: state.transactions.filter((t) => t.id !== id)
-    }));
+    set((state) => {
+      const filteredTransactions = state.transactions.filter((t) => t.id !== id);
+      const updatedBudgets = recalculateBudgetSpent(state.budgets, filteredTransactions, state.categories);
+      const updatedAccounts = recalculateAccountBalances(state.accounts, filteredTransactions);
+      return {
+        transactions: filteredTransactions,
+        budgets: updatedBudgets,
+        accounts: updatedAccounts
+      };
+    });
     saveToStorage(get());
   },
   
