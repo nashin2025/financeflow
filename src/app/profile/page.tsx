@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/stores/app-store";
 import { useRouter } from "next/navigation";
 import { formatCurrency, cn } from "@/lib/utils";
+import { ProfilePhotoUploadModal } from "@/components/profile-photo-upload-modal";
 import Link from "next/link";
 import { 
   User, 
@@ -33,6 +34,7 @@ export default function ProfilePage() {
   const { user, transactions, accounts, goals, setUser, isPremium, logout, currency } = useAppStore();
   const router = useRouter();
   const [showEditModal, setShowEditModal] = React.useState(false);
+  const [showPhotoModal, setShowPhotoModal] = React.useState(false);
   const [editName, setEditName] = React.useState(user?.name || "");
   const [editEmail, setEditEmail] = React.useState(user?.email || "");
 
@@ -79,7 +81,7 @@ export default function ProfilePage() {
                   <div className="w-24 h-24 rounded-2xl gradient-primary flex items-center justify-center text-4xl font-bold text-white">
                     {user?.name?.split(" ").map(n => n[0]).join("") || "AC"}
                   </div>
-                  <button onClick={() => alert("Profile photo upload coming soon")} className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-background-elevated border-2 border-background flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <button onClick={() => setShowPhotoModal(true)} className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-background-elevated border-2 border-background flex items-center justify-center hover:bg-white/10 transition-colors">
                     <Camera className="h-4 w-4 text-foreground-secondary" />
                   </button>
                 </div>
@@ -306,6 +308,13 @@ export default function ProfilePage() {
       <div className="lg:hidden">
         <BottomNav />
       </div>
+
+      {/* Profile Photo Upload Modal */}
+      <ProfilePhotoUploadModal
+        user={user}
+        isOpen={showPhotoModal}
+        onClose={() => setShowPhotoModal(false)}
+      />
     </div>
   );
 }

@@ -10,6 +10,7 @@ import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
 import { useRouter } from "next/navigation";
+import { ReceiptScannerModal } from "@/components/receipt-scanner-modal";
 import { 
   Plus, 
   Minus, 
@@ -45,6 +46,7 @@ export default function AddTransactionPage() {
   const [isRecurring, setIsRecurring] = React.useState(false);
   const [showSuccess, setShowSuccess] = React.useState(false);
   const [error, setError] = React.useState("");
+  const [showReceiptScanner, setShowReceiptScanner] = React.useState(false);
 
   const filteredCategories = categories.filter(c => c.type === (type === "expense" ? "expense" : "income"));
 
@@ -246,7 +248,7 @@ export default function AddTransactionPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => alert("Receipt scanning feature coming soon")}
+                  onClick={() => setShowReceiptScanner(true)}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-foreground-secondary hover:text-foreground transition-colors"
                 >
                   <Camera className="h-4 w-4" />
@@ -268,6 +270,18 @@ export default function AddTransactionPage() {
       <div className="lg:hidden">
         <BottomNav />
       </div>
+
+      {/* Receipt Scanner Modal */}
+      <ReceiptScannerModal
+        isOpen={showReceiptScanner}
+        onClose={() => setShowReceiptScanner(false)}
+        onScanComplete={(transactionData) => {
+          // Pre-fill the form with scanned data
+          setAmount(transactionData.amount.toString());
+          setDescription(`Receipt: ${transactionData.merchantName || 'Scanned receipt'}`);
+          setDate(transactionData.date);
+        }}
+      />
     </div>
   );
 }

@@ -11,6 +11,8 @@ import { useAppStore } from "@/stores/app-store";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { PremiumLock } from "@/components/premium-lock";
+import { EditProfileModal } from "@/components/edit-profile-modal";
+import { ConnectedAccountsModal } from "@/components/connected-accounts-modal";
 import { 
   User, 
   Bell, 
@@ -75,8 +77,8 @@ function SettingsItem({ icon, label, description, value, onClick, badge, danger 
 
 export default function SettingsPage() {
   const { 
-    user, theme, setTheme, isPremium, 
-    currency, setCurrency, language, setLanguage, 
+    user, categories, accounts, theme, setTheme, isPremium,
+    currency, setCurrency, language, setLanguage,
     weekStartsOn, setWeekStartsOn, budgetPeriod, setBudgetPeriod,
     notifications, setNotifications,
     security, setSecurity, logout
@@ -85,10 +87,13 @@ export default function SettingsPage() {
   const [showUpgradeMsg, setShowUpgradeMsg] = React.useState(false);
   const [showCurrencyModal, setShowCurrencyModal] = React.useState(false);
   const [showLanguageModal, setShowLanguageModal] = React.useState(false);
+  const [showEditProfileModal, setShowEditProfileModal] = React.useState(false);
+  const [showConnectedAccountsModal, setShowConnectedAccountsModal] = React.useState(false);
   const [showWeekModal, setShowWeekModal] = React.useState(false);
   const [showBudgetPeriodModal, setShowBudgetPeriodModal] = React.useState(false);
   const [showExportModal, setShowExportModal] = React.useState(false);
   const [showImportModal, setShowImportModal] = React.useState(false);
+  const [selectedImportFile, setSelectedImportFile] = React.useState<File | null>(null);
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
   const [showPasswordModal, setShowPasswordModal] = React.useState(false);
   const [showLoginHistoryModal, setShowLoginHistoryModal] = React.useState(false);
@@ -117,9 +122,95 @@ export default function SettingsPage() {
     setShowExportModal(false);
   };
 
-  const handleImport = () => {
-    alert("Import functionality coming soon!");
-    setShowImportModal(false);
+  const handleImport = async (file: File) => {
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const csv = e.target?.result as string;
+      const lines = csv.split('\n').filter(line => line.trim());
+
+      if (lines.length < 2) {
+        alert('CSV file must contain at least a header row and one data row');
+        return;
+      }
+
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+      const transactions = [];
+
+      // Expected format: date,description,amount,type,category (optional)
+      const dateIndex = headers.findIndex(h => h.includes('date'));
+      const descIndex = headers.findIndex(h => h.includes('description') || h.includes('desc'));
+      const amountIndex = headers.findIndex(h => h.includes('amount'));
+      const typeIndex = headers.findIndex(h => h.includes('type'));
+      const categoryIndex = headers.findIndex(h => h.includes('category') || h.includes('cat'));
+
+      if (dateIndex === -1 || descIndex === -1 || amountIndex === -1) {
+        alert('CSV must contain columns for date, description, and amount');
+        return;
+      }
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+
+        try {
+          const date = new Date(values[dateIndex]);
+          const description = values[descIndex];
+          const amount = parseFloat(values[amountIndex].replace(/[$,]/g, ''));
+
+          if (isNaN(amount) || !description) continue;
+
+          const type = typeIndex !== -1 ? values[typeIndex]?.toLowerCase() : 'expense';
+          const transactionType = type === 'income' ? 'income' : 'expense';
+
+          // Find matching category or use default
+          let categoryId = '1'; // Default category
+          if (categoryIndex !== -1 && values[categoryIndex]) {
+            const categoryName = values[categoryIndex];
+            const category = categories.find(c => c.name.toLowerCase() === categoryName.toLowerCase() && c.type === transactionType);
+            if (category) categoryId = category.id;
+          }
+
+          transactions.push({
+            type: transactionType,
+            amount: Math.abs(amount),
+            description,
+            date: date.toISOString().split('T')[0],
+            categoryId,
+            accountId: accounts[0]?.id || '1',
+          });
+        } catch (error) {
+          console.warn(`Skipping invalid row ${i + 1}:`, error);
+        }
+      }
+
+      if (transactions.length === 0) {
+        alert('No valid transactions found in the CSV file');
+        return;
+      }
+
+      // Import transactions
+      for (const transaction of transactions) {
+        try {
+          const response = await fetch('/api/transactions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(transaction),
+          });
+
+          if (!response.ok) {
+            console.error('Failed to import transaction:', transaction);
+          }
+        } catch (error) {
+          console.error('Error importing transaction:', error);
+        }
+      }
+
+      alert(`Successfully imported ${transactions.length} transactions!`);
+      setShowImportModal(false);
+    };
+
+    reader.readAsText(file);
   };
 
   const handleDeleteAccount = () => {
@@ -218,7 +309,7 @@ export default function SettingsPage() {
                     )}
                   </div>
                 </div>
-                <Button variant="secondary" size="sm" onClick={() => alert("Edit profile coming soon")}>
+                <Button variant="secondary" size="sm" onClick={() => setShowEditProfileModal(true)}>
                   Edit Profile
                 </Button>
               </div>
@@ -515,7 +606,7 @@ export default function SettingsPage() {
                   icon={<CreditCard className="h-5 w-5" />}
                   label="Connected Accounts"
                   description="Manage linked accounts"
-                  onClick={() => alert("Connected accounts management coming soon")}
+                  onClick={() => setShowConnectedAccountsModal(true)}
                 />
                 <SettingsItem
                   icon={<Trash2 className="h-5 w-5" />}
@@ -556,12 +647,12 @@ export default function SettingsPage() {
                 <SettingsItem
                   icon={<FileText className="h-5 w-5" />}
                   label="Privacy Policy"
-                  onClick={() => alert("Privacy Policy page coming soon")}
+                  onClick={() => router.push('/privacy-policy')}
                 />
                 <SettingsItem
                   icon={<FileText className="h-5 w-5" />}
                   label="Terms of Service"
-                  onClick={() => alert("Terms of Service page coming soon")}
+                  onClick={() => router.push('/terms-of-service')}
                 />
                 <SettingsItem
                   icon={<MessageCircle className="h-5 w-5" />}
@@ -576,12 +667,12 @@ export default function SettingsPage() {
                 <SettingsItem
                   icon={<FileText className="h-5 w-5" />}
                   label="Privacy Policy"
-                  onClick={() => alert("Privacy Policy page coming soon")}
+                  onClick={() => router.push('/privacy-policy')}
                 />
                 <SettingsItem
                   icon={<FileText className="h-5 w-5" />}
                   label="Terms of Service"
-                  onClick={() => alert("Terms of Service page coming soon")}
+                  onClick={() => router.push('/terms-of-service')}
                 />
               </div>
             </CardContent>
@@ -791,16 +882,41 @@ export default function SettingsPage() {
           <div className="relative w-full max-w-sm glass-elevated rounded-2xl p-6 animate-fadeIn">
             <h2 className="text-lg font-semibold text-foreground mb-4">Import Transactions</h2>
             <p className="text-sm text-foreground-secondary mb-4">Upload a CSV file to import transactions:</p>
-            <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center">
+            <div
+              className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center cursor-pointer hover:border-white/30 transition-colors"
+              onClick={() => document.getElementById('csv-import')?.click()}
+            >
               <Download className="h-8 w-8 text-foreground-tertiary mx-auto mb-2" />
-              <p className="text-sm text-foreground-secondary">Click to upload CSV</p>
-              <input type="file" accept=".csv" className="hidden" />
+              <p className="text-sm text-foreground-secondary">
+                {selectedImportFile ? selectedImportFile.name : 'Click to upload CSV'}
+              </p>
+              <input
+                id="csv-import"
+                type="file"
+                accept=".csv"
+                className="hidden"
+                onChange={(e) => setSelectedImportFile(e.target.files?.[0] || null)}
+              />
             </div>
+            {selectedImportFile && (
+              <div className="mt-4 p-3 bg-white/5 rounded-lg">
+                <p className="text-sm text-foreground">
+                  File: {selectedImportFile.name} ({(selectedImportFile.size / 1024).toFixed(1)} KB)
+                </p>
+              </div>
+            )}
             <div className="flex gap-2 mt-4">
-              <Button variant="secondary" className="flex-1" onClick={() => setShowImportModal(false)}>
+              <Button variant="secondary" className="flex-1" onClick={() => {
+                setShowImportModal(false);
+                setSelectedImportFile(null);
+              }}>
                 Cancel
               </Button>
-              <Button className="flex-1" onClick={handleImport}>
+              <Button
+                className="flex-1"
+                disabled={!selectedImportFile}
+                onClick={() => selectedImportFile && handleImport(selectedImportFile)}
+              >
                 Import
               </Button>
             </div>
@@ -923,6 +1039,19 @@ export default function SettingsPage() {
       <div className="lg:hidden">
         <BottomNav />
       </div>
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        user={user}
+        isOpen={showEditProfileModal}
+        onClose={() => setShowEditProfileModal(false)}
+      />
+
+      {/* Connected Accounts Modal */}
+      <ConnectedAccountsModal
+        isOpen={showConnectedAccountsModal}
+        onClose={() => setShowConnectedAccountsModal(false)}
+      />
     </div>
   );
 }

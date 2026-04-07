@@ -10,9 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
-import { 
-  Search, 
-  Plus, 
+import { EditTransactionModal } from "@/components/edit-transaction-modal";
+import {
+  Search,
+  Plus,
   ChevronDown,
   ChevronUp,
   MoreHorizontal,
@@ -38,6 +39,7 @@ export default function TransactionsPage() {
   const [expandedDate, setExpandedDate] = React.useState<string | null>(null);
   const [selectionMode, setSelectionMode] = React.useState(false);
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
+  const [editingTransaction, setEditingTransaction] = React.useState<any>(null);
 
   const getCategoryInfo = (categoryId: string) => {
     const category = categories.find(c => c.id === categoryId);
@@ -290,14 +292,14 @@ export default function TransactionsPage() {
                                   </button>
                                   {menuOpenId === transaction.id && (
                                     <div className="absolute right-0 top-full mt-1 w-40 bg-[#1a1a2e] border border-white/10 rounded-lg shadow-lg z-10 overflow-hidden">
-                                      <button
-                                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-white/10 transition-colors"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setMenuOpenId(null);
-                                          alert("Edit transaction - coming soon");
-                                        }}
-                                      >
+                                       <button
+                                         className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-white/10 transition-colors"
+                                         onClick={(e) => {
+                                           e.stopPropagation();
+                                           setMenuOpenId(null);
+                                           setEditingTransaction(transaction);
+                                         }}
+                                       >
                                         <Pencil className="h-3.5 w-3.5" />
                                         Edit
                                       </button>
@@ -373,6 +375,13 @@ export default function TransactionsPage() {
       <div className="lg:hidden">
         <BottomNav />
       </div>
+
+      {/* Edit Transaction Modal */}
+      <EditTransactionModal
+        transaction={editingTransaction}
+        isOpen={!!editingTransaction}
+        onClose={() => setEditingTransaction(null)}
+      />
     </div>
   );
 }

@@ -432,7 +432,7 @@ export default function GoalsPage() {
                           </p>
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm" onClick={() => alert("Contribute to goal - coming soon")}>
+                      <Button variant="ghost" size="sm" onClick={() => setSelectedGoal(goals.find(g => g.id === goal.id) || null)}>
                         Contribute
                       </Button>
                     </div>

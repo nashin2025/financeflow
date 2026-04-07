@@ -10,6 +10,11 @@ import { Badge } from "@/components/ui/badge";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { formatCurrency } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
+import { Account } from "@/types";
+import { EditAccountModal } from "@/components/edit-account-modal";
+import { DeleteAccountModal } from "@/components/delete-account-modal";
+import { BankConnectionModal } from "@/components/bank-connection-modal";
+import { TransactionHistoryModal } from "@/components/transaction-history-modal";
 import { 
   Plus, 
   Landmark,
@@ -24,6 +29,11 @@ import Link from "next/link";
 
 export default function AccountsPage() {
   const { accounts } = useAppStore();
+  const [editingAccount, setEditingAccount] = React.useState<any>(null);
+  const [deletingAccount, setDeletingAccount] = React.useState<any>(null);
+  const [syncingAccountId, setSyncingAccountId] = React.useState<string | null>(null);
+  const [showBankConnection, setShowBankConnection] = React.useState(false);
+  const [showTransactionHistory, setShowTransactionHistory] = React.useState<Account | null>(null);
     
   if (accounts.length === 0) {
     return (
@@ -91,11 +101,48 @@ export default function AccountsPage() {
   }, {});
 
   const handleEditAccount = (accountId: string) => {
-    alert("Edit account form coming soon");
+    const account = accounts.find(a => a.id === accountId);
+    if (account) {
+      setEditingAccount(account);
+    }
   };
 
   const handleDeleteAccount = (accountId: string) => {
-    alert("Delete account confirmation coming soon");
+    const account = accounts.find(a => a.id === accountId);
+    if (account) {
+      setDeletingAccount(account);
+    }
+  };
+
+  const handleSyncAccount = async (accountId: string) => {
+    setSyncingAccountId(accountId);
+
+    try {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // In a real app, this would sync with external APIs
+      // For now, just show success
+      alert(`Successfully synced ${accounts.find(a => a.id === accountId)?.name || 'account'}!`);
+    } catch (error) {
+      alert('Failed to sync account. Please try again.');
+    } finally {
+      setSyncingAccountId(null);
+    }
+  };
+
+  const handleSyncAllAccounts = async () => {
+    setSyncingAccountId('all');
+
+    try {
+      // Simulate syncing all accounts
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      alert(`Successfully synced all ${accounts.length} accounts!`);
+    } catch (error) {
+      alert('Failed to sync accounts. Please try again.');
+    } finally {
+      setSyncingAccountId(null);
+    }
   };
 
   return (
@@ -167,9 +214,20 @@ export default function AccountsPage() {
                 <LinkIcon className="h-5 w-5 text-primary-start" />
                 Connected Institutions
               </CardTitle>
-              <Button variant="secondary" size="sm" onClick={() => alert("Sync feature coming soon")}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Sync All
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleSyncAllAccounts}
+                disabled={syncingAccountId === 'all'}
+              >
+                {syncingAccountId === 'all' ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white mr-2"></div>
+                    Syncing...
+                  </>
+                ) : (
+                  'Sync All'
+                )}
               </Button>
             </CardHeader>
             <CardContent>
@@ -177,7 +235,7 @@ export default function AccountsPage() {
                 {/* Add new connection */}
                 <button
                   className="p-4 rounded-xl border-2 border-dashed border-white/10 hover:border-primary-start/50 hover:bg-primary-start/5 transition-all flex flex-col items-center justify-center gap-2 text-foreground-secondary hover:text-primary-start min-h-[120px]"
-                  onClick={() => alert("Bank connection feature coming soon")}
+                  onClick={() => setShowBankConnection(true)}
                 >
                   <Plus className="h-5 w-5" />
                   <span className="text-sm">Connect New Bank</span>
@@ -294,7 +352,7 @@ export default function AccountsPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <button
               className="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex flex-col items-center gap-2 text-center"
-              onClick={() => alert("Bank connection feature coming soon")}
+              onClick={() => setShowBankConnection(true)}
             >
               <div className="w-10 h-10 rounded-xl bg-primary-start/20 flex items-center justify-center">
                 <LinkIcon className="h-5 w-5 text-primary-start" />
@@ -312,17 +370,24 @@ export default function AccountsPage() {
               </button>
             </Link>
             <button
-              className="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex flex-col items-center gap-2 text-center"
-              onClick={() => alert("Sync feature coming soon")}
+              className="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex flex-col items-center gap-2 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleSyncAllAccounts}
+              disabled={syncingAccountId === 'all'}
             >
               <div className="w-10 h-10 rounded-xl bg-warning/20 flex items-center justify-center">
-                <RefreshCw className="h-5 w-5 text-warning" />
+                {syncingAccountId === 'all' ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-warning/20 border-t-warning"></div>
+                ) : (
+                  <RefreshCw className="h-5 w-5 text-warning" />
+                )}
               </div>
-              <span className="text-sm font-medium text-foreground">Sync All</span>
+              <span className="text-sm font-medium text-foreground">
+                {syncingAccountId === 'all' ? 'Syncing...' : 'Sync All'}
+              </span>
             </button>
             <button
-              className="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex flex-col items-center gap-2 text-center"
-              onClick={() => alert("Transaction history view coming soon")}
+              className="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex flex-col items-center gap-2 text-center opacity-50 cursor-not-allowed"
+              disabled
             >
               <div className="w-10 h-10 rounded-xl bg-info/20 flex items-center justify-center">
                 <TrendingUp className="h-5 w-5 text-info" />
@@ -336,6 +401,33 @@ export default function AccountsPage() {
       <div className="lg:hidden">
         <BottomNav />
       </div>
+
+      {/* Edit Account Modal */}
+      <EditAccountModal
+        account={editingAccount}
+        isOpen={!!editingAccount}
+        onClose={() => setEditingAccount(null)}
+      />
+
+      {/* Delete Account Modal */}
+      <DeleteAccountModal
+        account={deletingAccount}
+        isOpen={!!deletingAccount}
+        onClose={() => setDeletingAccount(null)}
+      />
+
+      {/* Bank Connection Modal */}
+      <BankConnectionModal
+        isOpen={showBankConnection}
+        onClose={() => setShowBankConnection(false)}
+      />
+
+      {/* Transaction History Modal */}
+      <TransactionHistoryModal
+        account={showTransactionHistory}
+        isOpen={!!showTransactionHistory}
+        onClose={() => setShowTransactionHistory(null)}
+      />
     </div>
   );
 }

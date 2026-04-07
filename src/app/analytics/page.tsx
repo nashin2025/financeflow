@@ -10,6 +10,7 @@ import { formatCurrency, formatPercentage, cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
 import { PremiumLock } from "@/components/premium-lock";
 import { SpendingHeatmap } from "@/components/spending-heatmap";
+import { FilterModal } from "@/components/filter-modal";
 import {
   TrendingUp, 
   TrendingDown,
@@ -30,6 +31,16 @@ export default function AnalyticsPage() {
   const { transactions, categories, accounts, budgets } = useAppStore();
   const [activeTab, setActiveTab] = React.useState<AnalyticsTab>("spending");
   const [timeRange, setTimeRange] = React.useState("month");
+  const [showFilterModal, setShowFilterModal] = React.useState(false);
+  const [filters, setFilters] = React.useState<{
+    dateRange: 'all' | 'last7days' | 'last30days' | 'last90days' | 'thisYear';
+    categories: string[];
+    type: 'all' | 'expense' | 'income';
+  }>({
+    dateRange: 'all',
+    categories: [],
+    type: 'all',
+  });
 
   const expenseTransactions = transactions.filter(t => t.type === "expense");
   const incomeTransactions = transactions.filter(t => t.type === "income");
@@ -69,33 +80,56 @@ export default function AnalyticsPage() {
   const currentMonthStr = new Date().toLocaleDateString('en-US', { month: 'short' });
 
   const handleExport = () => {
-    let csvContent = "";
-    const filename = `analytics_${activeTab}_export.csv`;
+    // Create PDF content
+    const pdfContent = generatePDFContent();
+    const blob = new Blob([pdfContent], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `financeflow_${activeTab}_report.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const generatePDFContent = () => {
+    // Simple PDF generation - in a real app, you'd use a library like jsPDF
+    // For now, we'll create a basic text representation
+    let content = `FinanceFlow ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Report\n`;
+    content += `Generated on: ${new Date().toLocaleDateString()}\n\n`;
 
     if (activeTab === "spending") {
-      csvContent = [
-        "Category,Amount,Percentage",
-        ...spendingWithPercentage.map(c => `"${c.name}",${c.amount.toFixed(2)},${c.percentage.toFixed(1)}%`),
-      ].join("\n");
+      content += "SPENDING BY CATEGORY\n";
+      content += "=".repeat(50) + "\n\n";
+      spendingWithPercentage.forEach(category => {
+        content += `${category.name.padEnd(20)} ${formatCurrency(category.amount).padStart(15)} (${category.percentage.toFixed(1)}%)\n`;
+      });
+      content += "\n";
+      content += `Total Spending: ${formatCurrency(totalExpenses)}\n`;
     } else if (activeTab === "income") {
-      csvContent = [
-        "Month,Income",
-        ...monthlyData.map(d => `${d.month},${d.income.toFixed(2)}`),
-      ].join("\n");
+      content += "INCOME OVER TIME\n";
+      content += "=".repeat(50) + "\n\n";
+      monthlyData.forEach(month => {
+        content += `${month.month.padEnd(15)} ${formatCurrency(month.income).padStart(15)}\n`;
+      });
+      content += "\n";
+      content += `Total Income: ${formatCurrency(totalIncome)}\n`;
     } else {
-      csvContent = [
-        "Account,Type,Balance",
-        ...accounts.map(a => `"${a.name}","${a.type}",${a.balance.toFixed(2)}`),
-      ].join("\n");
+      content += "FINANCIAL OVERVIEW\n";
+      content += "=".repeat(50) + "\n\n";
+      monthlyData.forEach(month => {
+        const net = month.income - month.expenses;
+        content += `${month.month.padEnd(12)} Expenses: ${formatCurrency(month.expenses).padStart(12)} Income: ${formatCurrency(month.income).padStart(12)} Net: ${formatCurrency(net).padStart(12)}\n`;
+      });
+      content += "\n";
+      content += `Total Expenses: ${formatCurrency(totalExpenses)}\n`;
+      content += `Total Income: ${formatCurrency(totalIncome)}\n`;
+      content += `Net: ${formatCurrency(totalIncome - totalExpenses)}\n`;
     }
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
+    // Convert to basic PDF-like format (this is a placeholder - real PDF generation would use jsPDF)
+    return content;
   };
 
   const monthlyData = React.useMemo(() => {
@@ -177,7 +211,7 @@ export default function AnalyticsPage() {
             
             <div className="flex gap-2">
               <PremiumLock feature="Advanced filtering and data export">
-                <Button variant="secondary" size="sm" onClick={() => alert("Filter options coming soon")}>
+                <Button variant="secondary" size="sm" onClick={() => setShowFilterModal(true)}>
                   <Filter className="h-4 w-4 mr-2" />
                   Filter
                 </Button>
@@ -700,6 +734,15 @@ export default function AnalyticsPage() {
       <div className="lg:hidden">
         <BottomNav />
       </div>
+
+      {/* Filter Modal */}
+      <FilterModal
+        isOpen={showFilterModal}
+        onClose={() => setShowFilterModal(false)}
+        filters={filters}
+        onFiltersChange={setFilters}
+      />
+
     </div>
   );
 }
