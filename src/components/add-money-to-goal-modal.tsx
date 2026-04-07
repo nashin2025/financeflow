@@ -16,7 +16,7 @@ interface AddMoneyToGoalModalProps {
     targetAmount: number;
     icon: string;
     color: string;
-  };
+  } | null;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -29,6 +29,8 @@ export function AddMoneyToGoalModal({ goal, isOpen, onClose }: AddMoneyToGoalMod
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!goal) return;
 
     const numAmount = parseFloat(amount);
     if (!numAmount || numAmount <= 0) {
@@ -57,7 +59,9 @@ export function AddMoneyToGoalModal({ goal, isOpen, onClose }: AddMoneyToGoalMod
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update goal');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('API Error:', response.status, errorData);
+        throw new Error(errorData?.error || `Failed to update goal (${response.status})`);
       }
 
       // Update goal in store (this will trigger any necessary recalculations)
@@ -67,7 +71,9 @@ export function AddMoneyToGoalModal({ goal, isOpen, onClose }: AddMoneyToGoalMod
       setAmount("");
       onClose();
     } catch (err) {
-      setError("Failed to add money to goal. Please try again.");
+      const errorMessage = err instanceof Error ? err.message : "Failed to add money to goal. Please try again.";
+      console.error('Add money error:', errorMessage);
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -78,6 +84,10 @@ export function AddMoneyToGoalModal({ goal, isOpen, onClose }: AddMoneyToGoalMod
     setError("");
     onClose();
   };
+
+  if (!goal) {
+    return null;
+  }
 
   const remainingAmount = goal.targetAmount - goal.currentAmount;
   const percentage = (goal.currentAmount / goal.targetAmount) * 100;

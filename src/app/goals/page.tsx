@@ -15,6 +15,7 @@ import { GoalCelebration, checkGoalMilestone } from "@/components/goal-celebrati
 import { GoalDetailsModal } from "@/components/goal-details-modal";
 import { EditGoalModal } from "@/components/edit-goal-modal";
 import { DeleteGoalModal } from "@/components/delete-goal-modal";
+import { Goal } from "@/types";
 import { AddMoneyToGoalModal } from "@/components/add-money-to-goal-modal";
 import Link from "next/link";
 import { 
@@ -35,9 +36,9 @@ export default function GoalsPage() {
   const { goals, isPremium } = useAppStore();
   const [showUpgradeMsg, setShowUpgradeMsg] = React.useState(false);
   const [celebration, setCelebration] = React.useState<{ goalName: string; milestone: number } | null>(null);
-  const [selectedGoal, setSelectedGoal] = React.useState<any>(null);
-  const [goalToEdit, setGoalToEdit] = React.useState<any>(null);
-  const [goalToDelete, setGoalToDelete] = React.useState<any>(null);
+  const [selectedGoal, setSelectedGoal] = React.useState<Goal | null>(null);
+  const [goalToEdit, setGoalToEdit] = React.useState<Goal | null>(null);
+  const [goalToDelete, setGoalToDelete] = React.useState<Goal | null>(null);
   const [showDetailsModal, setShowDetailsModal] = React.useState(false);
 
   // Check for goal milestones
@@ -123,25 +124,11 @@ export default function GoalsPage() {
       )}
 
       {/* Add Money to Goal Modal */}
-      {selectedGoal && (
-        <AddMoneyToGoalModal
-          goal={selectedGoal}
-          isOpen={!!selectedGoal && !showDetailsModal}
-          onClose={() => setSelectedGoal(null)}
-        />
-      )}
-
-      {/* Goal Details Modal */}
-      {selectedGoal && showDetailsModal && (
-        <GoalDetailsModal
-          goal={selectedGoal}
-          isOpen={showDetailsModal}
-          onClose={() => {
-            setSelectedGoal(null);
-            setShowDetailsModal(false);
-          }}
-        />
-      )}
+      <AddMoneyToGoalModal
+        goal={selectedGoal}
+        isOpen={!!selectedGoal && !showDetailsModal}
+        onClose={() => setSelectedGoal(null)}
+      />
 
       {/* Edit Goal Modal */}
       {goalToEdit && (
