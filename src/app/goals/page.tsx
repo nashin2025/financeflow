@@ -12,6 +12,9 @@ import { formatCurrency, cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
 import { FREE_LIMITS } from "@/lib/features";
 import { GoalCelebration, checkGoalMilestone } from "@/components/goal-celebration";
+import { GoalDetailsModal } from "@/components/goal-details-modal";
+import { EditGoalModal } from "@/components/edit-goal-modal";
+import { DeleteGoalModal } from "@/components/delete-goal-modal";
 import { AddMoneyToGoalModal } from "@/components/add-money-to-goal-modal";
 import Link from "next/link";
 import { 
@@ -33,6 +36,9 @@ export default function GoalsPage() {
   const [showUpgradeMsg, setShowUpgradeMsg] = React.useState(false);
   const [celebration, setCelebration] = React.useState<{ goalName: string; milestone: number } | null>(null);
   const [selectedGoal, setSelectedGoal] = React.useState<any>(null);
+  const [goalToEdit, setGoalToEdit] = React.useState<any>(null);
+  const [goalToDelete, setGoalToDelete] = React.useState<any>(null);
+  const [showDetailsModal, setShowDetailsModal] = React.useState(false);
 
   // Check for goal milestones
   React.useEffect(() => {
@@ -120,8 +126,38 @@ export default function GoalsPage() {
       {selectedGoal && (
         <AddMoneyToGoalModal
           goal={selectedGoal}
-          isOpen={!!selectedGoal}
+          isOpen={!!selectedGoal && !showDetailsModal}
           onClose={() => setSelectedGoal(null)}
+        />
+      )}
+
+      {/* Goal Details Modal */}
+      {selectedGoal && showDetailsModal && (
+        <GoalDetailsModal
+          goal={selectedGoal}
+          isOpen={showDetailsModal}
+          onClose={() => {
+            setSelectedGoal(null);
+            setShowDetailsModal(false);
+          }}
+        />
+      )}
+
+      {/* Edit Goal Modal */}
+      {goalToEdit && (
+        <EditGoalModal
+          goal={goalToEdit}
+          isOpen={!!goalToEdit}
+          onClose={() => setGoalToEdit(null)}
+        />
+      )}
+
+      {/* Delete Goal Modal */}
+      {goalToDelete && (
+        <DeleteGoalModal
+          goal={goalToDelete}
+          isOpen={!!goalToDelete}
+          onClose={() => setGoalToDelete(null)}
         />
       )}
     </div>
@@ -274,10 +310,10 @@ export default function GoalsPage() {
                             <MoreHorizontal className="h-4 w-4 text-foreground-secondary" />
                           </button>
                         }
-                        items={[
-                          { label: "Edit", onClick: () => alert("Edit goal - coming soon") },
-                          { label: "Delete", onClick: () => alert("Delete goal - coming soon"), variant: "destructive" as const },
-                        ]}
+                         items={[
+                           { label: "Edit", onClick: () => setGoalToEdit(goal) },
+                           { label: "Delete", onClick: () => setGoalToDelete(goal), variant: "destructive" as const },
+                         ]}
                       />
                     </div>
                     
@@ -326,9 +362,12 @@ export default function GoalsPage() {
                        <Button variant="secondary" size="sm" className="flex-1" onClick={() => setSelectedGoal(goal)}>
                          Add Money
                        </Button>
-                       <Button variant="ghost" size="sm" onClick={() => alert("Goal details view - coming soon")}>
-                         View Details
-                       </Button>
+                        <Button variant="ghost" size="sm" onClick={() => {
+                          setSelectedGoal(goal);
+                          setShowDetailsModal(true);
+                        }}>
+                          View Details
+                        </Button>
                      </div>
                   </div>
                 );
