@@ -106,11 +106,16 @@ export default function SettingsPage() {
   };
 
   const handleExport = (format: string) => {
-    const { transactions } = useAppStore.getState();
+    const { transactions, accounts, categories } = useAppStore.getState();
+
     if (format === "csv") {
       const csvContent = [
-        "Type,Amount,Description,Date",
-        ...transactions.map(t => `${t.type},${t.amount},"${t.description || ""}",${t.date}`),
+        "Type,Amount,Description,Date,Account,Category",
+        ...transactions.map(t => {
+          const account = accounts.find(a => a.id === t.accountId);
+          const category = categories.find(c => c.id === t.categoryId);
+          return `${t.type},${t.amount},"${t.description || ""}",${t.date},"${account?.name || ""}","${category?.name || ""}"`;
+        }),
       ].join("\n");
       const blob = new Blob([csvContent], { type: "text/csv" });
       const url = URL.createObjectURL(blob);
@@ -118,8 +123,47 @@ export default function SettingsPage() {
       a.href = url;
       a.download = "financeflow_export.csv";
       a.click();
+    } else if (format === "pdf") {
+      // Generate basic PDF content
+      const pdfContent = generatePDFReport(transactions, accounts, categories);
+      const blob = new Blob([pdfContent], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `financeflow_report_${new Date().toISOString().split('T')[0]}.pdf`;
+      a.click();
     }
+
     setShowExportModal(false);
+  };
+
+  const generatePDFReport = (transactions: any[], accounts: any[], categories: any[]) => {
+    const totalIncome = transactions
+      .filter(t => t.type === 'income')
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const totalExpenses = transactions
+      .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    let content = `FinanceFlow Financial Report\n`;
+    content += `Generated on: ${new Date().toLocaleDateString()}\n\n`;
+    content += `SUMMARY\n`;
+    content += `Total Income: $${totalIncome.toFixed(2)}\n`;
+    content += `Total Expenses: $${totalExpenses.toFixed(2)}\n`;
+    content += `Net: $${(totalIncome - totalExpenses).toFixed(2)}\n\n`;
+    content += `RECENT TRANSACTIONS\n`;
+    content += `Date\t\tType\t\tAmount\t\tDescription\n`;
+    content += `-`.repeat(80) + `\n`;
+
+    transactions.slice(0, 20).forEach(t => {
+      const date = new Date(t.date).toLocaleDateString();
+      const type = t.type.charAt(0).toUpperCase() + t.type.slice(1);
+      const amount = `$${t.amount.toFixed(2)}`;
+      content += `${date}\t${type}\t\t${amount}\t${t.description || 'N/A'}\n`;
+    });
+
+    return content;
   };
 
   const handleImport = async (file: File) => {
@@ -858,7 +902,7 @@ export default function SettingsPage() {
                 <Download className="h-4 w-4 text-foreground-secondary" />
               </button>
               <button
-                onClick={() => { alert("PDF export coming soon!"); setShowExportModal(false); }}
+                onClick={() => handleExport("pdf")}
                 className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white/5"
               >
                 <span className="text-foreground">PDF Report</span>

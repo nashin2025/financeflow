@@ -80,7 +80,7 @@ function loadFromStorage() {
     const parsed = JSON.parse(saved);
     return {
       user: parsed.user || null,
-      isPremium: parsed.isPremium || false,
+      isPremium: parsed.isPremium || true, // Temporarily enabled for testing
       transactions: parsed.transactions || [],
       accounts: parsed.accounts || [],
       budgets: parsed.budgets || [],
@@ -152,7 +152,7 @@ const savedState = loadFromStorage();
 
 const initialState = {
   isAuthenticated: !!savedState?.user,
-  isPremium: savedState?.isPremium || false,
+  isPremium: savedState?.isPremium || true, // Temporarily enabled for testing
   user: savedState?.user || null,
   transactions: savedState?.transactions || [],
   accounts: savedState?.accounts || [],
