@@ -11,11 +11,13 @@ import { Progress } from "@/components/ui/progress";
 import { formatCurrency, formatPercentage, cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
 import { FREE_LIMITS } from "@/lib/features";
+import { EditBudgetModal } from "@/components/edit-budget-modal";
+import { DeleteBudgetModal } from "@/components/delete-budget-modal";
 import Link from "next/link";
-import { 
-  Plus, 
-  ArrowRight, 
-  TrendingUp, 
+import {
+  Plus,
+  ArrowRight,
+  TrendingUp,
   TrendingDown,
   AlertTriangle,
   CheckCircle,
@@ -23,13 +25,16 @@ import {
   Calendar,
   ArrowLeft,
   PiggyBank,
-  Crown
+  Crown,
+  Pencil
 } from "lucide-react";
 
 export default function BudgetsPage() {
   const { budgets, categories, transactions, isPremium } = useAppStore();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [showUpgradeMsg, setShowUpgradeMsg] = useState(false);
+  const [editingBudget, setEditingBudget] = useState<any>(null);
+  const [deletingBudget, setDeletingBudget] = useState<any>(null);
   
   const remainingBudgets = isPremium ? Infinity : Math.max(0, FREE_LIMITS.budgets - budgets.length);
   
@@ -49,13 +54,17 @@ export default function BudgetsPage() {
     window.location.href = "/add-budget";
   };
 
-  const handleEditBudget = (budgetName: string) => {
-    alert(`Edit budget: ${budgetName}`);
+  const handleEditBudget = (budgetId: string) => {
+    const budget = budgets.find(b => b.id === budgetId);
+    if (budget) {
+      setEditingBudget(budget);
+    }
   };
 
-  const handleDeleteBudget = (budgetName: string) => {
-    if (confirm(`Are you sure you want to delete "${budgetName}"?`)) {
-      alert(`Budget "${budgetName}" deleted`);
+  const handleDeleteBudget = (budgetId: string) => {
+    const budget = budgets.find(b => b.id === budgetId);
+    if (budget) {
+      setDeletingBudget(budget);
     }
   };
   
@@ -276,13 +285,23 @@ export default function BudgetsPage() {
                         </button>
                         {openMenuId === budget.id && (
                           <div className="absolute right-0 top-full z-10 mt-1 w-36 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 shadow-lg overflow-hidden">
-                            <button
-                              className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-white/10 transition-colors"
-                              onClick={() => {
-                                handleEditBudget(budget.name);
-                                setOpenMenuId(null);
-                              }}
-                            >
+                              <button
+                                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-white/10 transition-colors"
+                                onClick={() => {
+                                  setOpenMenuId(null);
+                                  handleEditBudget(budget.id);
+                                }}
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                                Edit
+                              </button>
+                              <button
+                                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-error hover:bg-white/10 transition-colors"
+                                onClick={() => {
+                                  setOpenMenuId(null);
+                                  handleDeleteBudget(budget.id);
+                                }}
+                              >
                               Edit
                             </button>
                             <button
@@ -390,6 +409,20 @@ export default function BudgetsPage() {
       <div className="lg:hidden">
         <BottomNav />
       </div>
+
+      {/* Edit Budget Modal */}
+      <EditBudgetModal
+        budget={editingBudget}
+        isOpen={!!editingBudget}
+        onClose={() => setEditingBudget(null)}
+      />
+
+      {/* Delete Budget Modal */}
+      <DeleteBudgetModal
+        budget={deletingBudget}
+        isOpen={!!deletingBudget}
+        onClose={() => setDeletingBudget(null)}
+      />
 
       {/* Upgrade Modal */}
       {showUpgradeMsg && (

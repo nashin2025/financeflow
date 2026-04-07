@@ -676,17 +676,17 @@ export default function SettingsPage() {
                 <SettingsItem
                   icon={<HelpCircle className="h-5 w-5" />}
                   label="Help Center"
-                  onClick={() => alert("Help Center opening...")}
+                  onClick={() => window.open('https://financeflow.app/help', '_blank')}
                 />
                 <SettingsItem
                   icon={<MessageCircle className="h-5 w-5" />}
                   label="Contact Support"
-                  onClick={() => alert("Contact support at: support@financeflow.app")}
+                  onClick={() => window.open('mailto:support@financeflow.app', '_blank')}
                 />
                 <SettingsItem
                   icon={<Star className="h-5 w-5" />}
                   label="Rate App"
-                  onClick={() => alert("Thank you for your interest!")}
+                  onClick={() => window.open('https://financeflow.app/rate', '_blank')}
                 />
                 <SettingsItem
                   icon={<FileText className="h-5 w-5" />}
@@ -701,12 +701,12 @@ export default function SettingsPage() {
                 <SettingsItem
                   icon={<MessageCircle className="h-5 w-5" />}
                   label="Contact Support"
-                  onClick={() => alert("Contact support at: support@financeflow.app")}
+                  onClick={() => window.open('mailto:support@financeflow.app', '_blank')}
                 />
                 <SettingsItem
                   icon={<Star className="h-5 w-5" />}
                   label="Rate App"
-                  onClick={() => alert("Thank you for your interest!")}
+                  onClick={() => window.open('https://financeflow.app/rate', '_blank')}
                 />
                 <SettingsItem
                   icon={<FileText className="h-5 w-5" />}

@@ -27,18 +27,12 @@ export function AddMoneyToGoalModal({ goal, isOpen, onClose }: AddMoneyToGoalMod
   const [error, setError] = React.useState("");
   const { updateGoal } = useAppStore();
 
-  React.useEffect(() => {
-    console.log('AddMoneyToGoalModal:', { goal, isOpen });
-  }, [goal, isOpen]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted with amount:', amount);
 
-    if (!goal) {
-      console.log('No goal provided');
-      return;
-    }
+    if (!goal) return;
 
     const numAmount = parseFloat(amount);
     if (!numAmount || numAmount <= 0) {
@@ -53,7 +47,6 @@ export function AddMoneyToGoalModal({ goal, isOpen, onClose }: AddMoneyToGoalMod
 
     setIsLoading(true);
     setError("");
-    console.log('Starting API call with goal:', goal.id, 'amount:', numAmount);
 
     try {
       const newCurrentAmount = goal.currentAmount + numAmount;
