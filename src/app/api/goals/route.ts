@@ -1,51 +1,33 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
-export async function GET(request: Request) {
+export async function PUT(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    const status = searchParams.get('status')
+    const id = searchParams.get('id')
 
-    const where: Record<string, unknown> = {}
-    if (status) where.status = status
-
-    const goals = await prisma.goal.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-    })
-
-    return NextResponse.json({ goals })
-  } catch (error) {
-    console.error('Error fetching goals:', error)
-    return NextResponse.json({ error: 'Failed to fetch goals' }, { status: 500 })
-  }
-}
-
-export async function POST(request: Request) {
-  try {
-    const body = await request.json()
-    const { name, type, targetAmount, targetDate, icon, color, monthlyContribution, userId } = body
-
-    if (!name || !type || !targetAmount || !targetDate) {
-      return NextResponse.json({ error: 'Name, type, targetAmount, and targetDate are required' }, { status: 400 })
+    if (!id) {
+      return NextResponse.json({ error: 'Goal ID is required' }, { status: 400 })
     }
 
-    const goal = await prisma.goal.create({
+    const body = await request.json()
+    const { currentAmount } = body
+
+    if (currentAmount === undefined) {
+      return NextResponse.json({ error: 'currentAmount is required' }, { status: 400 })
+    }
+
+    const updatedGoal = await prisma.goal.update({
+      where: { id },
       data: {
-        name,
-        type,
-        targetAmount: parseFloat(targetAmount),
-        targetDate: new Date(targetDate),
-        icon: icon || null,
-        color: color || null,
-        monthlyContribution: monthlyContribution ? parseFloat(monthlyContribution) : 0,
-        userId: userId || '1',
+        currentAmount: parseFloat(currentAmount),
+        updatedAt: new Date(),
       },
     })
 
-    return NextResponse.json({ goal, message: 'Goal created' }, { status: 201 })
+    return NextResponse.json({ goal: updatedGoal, message: 'Goal updated' })
   } catch (error) {
-    console.error('Error creating goal:', error)
-    return NextResponse.json({ error: 'Failed to create goal' }, { status: 500 })
+    console.error('Error updating goal:', error)
+    return NextResponse.json({ error: 'Failed to update goal' }, { status: 500 })
   }
 }

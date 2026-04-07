@@ -12,6 +12,7 @@ import { formatCurrency, cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
 import { FREE_LIMITS } from "@/lib/features";
 import { GoalCelebration, checkGoalMilestone } from "@/components/goal-celebration";
+import { AddMoneyToGoalModal } from "@/components/add-money-to-goal-modal";
 import Link from "next/link";
 import { 
   Plus, 
@@ -31,6 +32,7 @@ export default function GoalsPage() {
   const { goals, isPremium } = useAppStore();
   const [showUpgradeMsg, setShowUpgradeMsg] = React.useState(false);
   const [celebration, setCelebration] = React.useState<{ goalName: string; milestone: number } | null>(null);
+  const [selectedGoal, setSelectedGoal] = React.useState<any>(null);
 
   // Check for goal milestones
   React.useEffect(() => {
@@ -112,6 +114,15 @@ export default function GoalsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Add Money to Goal Modal */}
+      {selectedGoal && (
+        <AddMoneyToGoalModal
+          goal={selectedGoal}
+          isOpen={!!selectedGoal}
+          onClose={() => setSelectedGoal(null)}
+        />
       )}
     </div>
   );
@@ -311,14 +322,14 @@ export default function GoalsPage() {
                       </div>
                     )}
                     
-                    <div className="mt-3 flex gap-2">
-                      <Button variant="secondary" size="sm" className="flex-1" onClick={() => alert("Add money to goal - coming soon")}>
-                        Add Money
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => alert("Goal details view - coming soon")}>
-                        View Details
-                      </Button>
-                    </div>
+                     <div className="mt-3 flex gap-2">
+                       <Button variant="secondary" size="sm" className="flex-1" onClick={() => setSelectedGoal(goal)}>
+                         Add Money
+                       </Button>
+                       <Button variant="ghost" size="sm" onClick={() => alert("Goal details view - coming soon")}>
+                         View Details
+                       </Button>
+                     </div>
                   </div>
                 );
               })}
