@@ -332,17 +332,9 @@ export default function BudgetsPage() {
                                   handleDeleteBudget(budget.id);
                                 }}
                               >
-                              Edit
-                            </button>
-                            <button
-                              className="w-full px-4 py-2 text-left text-sm text-error hover:bg-white/10 transition-colors"
-                              onClick={() => {
-                                handleDeleteBudget(budget.name);
-                                setOpenMenuId(null);
-                              }}
-                            >
-                              Delete
-                            </button>
+                                <Trash2 className="h-3.5 w-3.5" />
+                                Delete
+                              </button>
                           </div>
                         )}
                       </div>
