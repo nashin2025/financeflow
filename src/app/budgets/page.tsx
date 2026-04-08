@@ -27,7 +27,8 @@ import {
   ArrowLeft,
   PiggyBank,
   Crown,
-  Pencil
+  Pencil,
+  Trash2
 } from "lucide-react";
 
 export default function BudgetsPage() {
