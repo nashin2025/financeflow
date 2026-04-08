@@ -375,11 +375,11 @@ export default function GoalsPage() {
                       </div>
                     )}
                     
-                      <div className="mt-3 flex gap-2">
-                        <Button variant="secondary" size="sm" className="flex-1" onClick={() => handleAddMoney(goal)}>
+                      <div className="mt-3 flex gap-3">
+                        <Button variant="primary" size="sm" className="flex-1 rounded-full" onClick={() => handleAddMoney(goal)}>
                           Add Money
                         </Button>
-                         <Button variant="ghost" size="sm" onClick={() => handleViewDetails(goal)}>
+                         <Button variant="ghost" size="sm" className="px-4 rounded-full" onClick={() => handleViewDetails(goal)}>
                            View Details
                          </Button>
                       </div>
@@ -389,11 +389,11 @@ export default function GoalsPage() {
 
               {/* Add Goal Button */}
               <button 
-                className="w-full p-5 rounded-xl border-2 border-dashed border-white/10 hover:border-primary-start/50 hover:bg-primary-start/5 transition-all flex items-center justify-center gap-2 text-foreground-secondary hover:text-primary-start"
+                className="w-full p-6 rounded-2xl border-2 border-dashed border-white/10 hover:border-primary-start/50 hover:bg-primary-start/5 transition-all duration-200 flex items-center justify-center gap-3 text-foreground-secondary hover:text-primary-start font-medium"
                 onClick={handleCreateGoal}
               >
-                <Plus className="h-5 w-5" />
-                <span className="font-medium">Create New Goal</span>
+                <Plus className="h-6 w-6" />
+                <span className="text-lg">Create New Goal</span>
               </button>
             </CardContent>
           </Card>
