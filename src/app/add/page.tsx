@@ -277,9 +277,9 @@ export default function AddTransactionPage() {
         onClose={() => setShowReceiptScanner(false)}
         onScanComplete={(transactionData) => {
           // Pre-fill the form with scanned data
-          setAmount(transactionData.amount.toString());
+          if (transactionData.amount) setAmount(transactionData.amount.toString());
           setDescription(`Receipt: ${transactionData.merchantName || 'Scanned receipt'}`);
-          setDate(transactionData.date);
+          if (transactionData.date) setDate(transactionData.date);
         }}
       />
     </div>

@@ -8,17 +8,24 @@ import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/stores/app-store";
 import { Camera, Upload, Scan, Loader2 } from "lucide-react";
 
+interface ScannedTransactionData {
+  amount?: number;
+  merchantName?: string;
+  date?: string;
+  categoryId?: string;
+}
+
 interface ReceiptScannerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onScanComplete?: (transactionData: unknown) => void;
+  onScanComplete?: (transactionData: ScannedTransactionData) => void;
 }
 
 export function ReceiptScannerModal({ isOpen, onClose, onScanComplete }: ReceiptScannerModalProps) {
   const [selectedImage, setSelectedImage] = React.useState<File | null>(null);
   const [imagePreview, setImagePreview] = React.useState<string | null>(null);
   const [isScanning, setIsScanning] = React.useState(false);
-  const [scanResult, setScanResult] = React.useState<unknown>(null);
+  const [scanResult, setScanResult] = React.useState<ScannedTransactionData | null>(null);
   const [error, setError] = React.useState("");
   const { categories, accounts, addTransaction } = useAppStore();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -82,10 +89,10 @@ export function ReceiptScannerModal({ isOpen, onClose, onScanComplete }: Receipt
     try {
       const transaction = {
         type: 'expense' as const,
-        amount: scanResult.amount,
-        description: `Receipt: ${scanResult.merchant}`,
-        merchantName: scanResult.merchant,
-        date: scanResult.date,
+        amount: scanResult.amount || 0,
+        description: `Receipt: ${scanResult.merchantName || 'Scanned receipt'}`,
+        merchantName: scanResult.merchantName,
+        date: scanResult.date || new Date().toISOString().split('T')[0],
         categoryId: categories.find(c => c.type === 'expense')?.id || '1',
         accountId: accounts[0]?.id || '1',
       };
@@ -215,15 +222,15 @@ export function ReceiptScannerModal({ isOpen, onClose, onScanComplete }: Receipt
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-foreground-secondary">Merchant:</span>
-                  <span className="text-foreground">{scanResult.merchant}</span>
+                  <span className="text-foreground">{scanResult.merchantName || 'Unknown'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-foreground-secondary">Amount:</span>
-                  <span className="text-foreground">${scanResult.amount.toFixed(2)}</span>
+                  <span className="text-foreground">${scanResult.amount?.toFixed(2) || '0.00'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-foreground-secondary">Date:</span>
-                  <span className="text-foreground">{new Date(scanResult.date).toLocaleDateString()}</span>
+                  <span className="text-foreground">{scanResult.date ? new Date(scanResult.date).toLocaleDateString() : 'Unknown'}</span>
                 </div>
               </div>
             </div>
