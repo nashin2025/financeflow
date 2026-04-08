@@ -3,35 +3,19 @@
 import * as React from "react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useAppStore } from "@/stores/app-store";
 import { formatCurrency } from "@/lib/utils";
-import { Loader2, Calendar, Target, DollarSign } from "lucide-react";
+import { Calendar, Target, DollarSign } from "lucide-react";
+import type { Goal } from "@/types";
 
 interface GoalDetailsModalProps {
-  goal: {
-    id: string;
-    name: string;
-    type: string;
-    targetAmount: number;
-    currentAmount: number;
-    targetDate: string;
-    monthlyContribution: number;
-    icon: string;
-    color: string;
-    createdAt: string;
-  };
+  goal: Goal | null;
   isOpen: boolean;
   onClose: () => void;
+  onEdit?: (goal: Goal) => void;
+  onDelete?: (goal: Goal) => void;
 }
 
-export function GoalDetailsModal({ goal, isOpen, onClose }: GoalDetailsModalProps) {
-  const progress = (goal.currentAmount / goal.targetAmount) * 100;
-  const remaining = goal.targetAmount - goal.currentAmount;
-  const daysRemaining = Math.max(0, Math.ceil((new Date(goal.targetDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)));
-  const monthsRemaining = Math.max(0, Math.ceil(daysRemaining / 30));
-  const monthlyNeeded = monthsRemaining > 0 ? remaining / monthsRemaining : 0;
-
+export function GoalDetailsModal({ goal, isOpen, onClose, onEdit, onDelete }: GoalDetailsModalProps) {
   const contributions = React.useMemo(() => {
     // This would ideally come from transaction data linked to this goal
     // For now, we'll show a placeholder
@@ -41,6 +25,14 @@ export function GoalDetailsModal({ goal, isOpen, onClose }: GoalDetailsModalProp
       { date: "2024-03-15", amount: 500, description: "Monthly contribution" },
     ];
   }, []);
+
+  if (!goal) return null;
+
+  const progress = (goal.currentAmount / goal.targetAmount) * 100;
+  const remaining = goal.targetAmount - goal.currentAmount;
+  const daysRemaining = Math.max(0, Math.ceil((new Date(goal.targetDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)));
+  const monthsRemaining = Math.max(0, Math.ceil(daysRemaining / 30));
+  const monthlyNeeded = monthsRemaining > 0 ? remaining / monthsRemaining : 0;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="lg">
@@ -189,6 +181,16 @@ export function GoalDetailsModal({ goal, isOpen, onClose }: GoalDetailsModalProp
 
         {/* Action Buttons */}
         <div className="flex gap-3 pt-4 border-t border-white/10">
+          {onDelete && (
+            <Button variant="danger" size="sm" onClick={() => onDelete(goal)}>
+              Delete
+            </Button>
+          )}
+          {onEdit && (
+            <Button variant="secondary" size="sm" onClick={() => onEdit(goal)}>
+              Edit
+            </Button>
+          )}
           <Button onClick={onClose} className="flex-1">
             Close
           </Button>

@@ -5,7 +5,6 @@ import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/stores/app-store";
-import { formatCurrency } from "@/lib/utils";
 import { GoalType } from "@/types";
 import { Loader2, Target, Calendar, DollarSign, Palette, Smile } from "lucide-react";
 

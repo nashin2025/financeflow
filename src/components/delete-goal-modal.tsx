@@ -4,31 +4,12 @@ import * as React from "react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/stores/app-store";
-
-interface DeleteGoalModalProps {
-  goal: {
-    id: string;
-    name: string;
-    currentAmount: number;
-    targetAmount: number;
-    icon: string;
-    color: string;
-  };
-  isOpen: boolean;
-  onClose: () => void;
-}
 import { formatCurrency } from "@/lib/utils";
 import { Loader2, AlertTriangle, Trash2 } from "lucide-react";
+import type { Goal } from "@/types";
 
 interface DeleteGoalModalProps {
-  goal: {
-    id: string;
-    name: string;
-    currentAmount: number;
-    targetAmount: number;
-    icon: string;
-    color: string;
-  };
+  goal: Goal;
   isOpen: boolean;
   onClose: () => void;
 }

@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress, ProgressRing } from "@/components/ui/progress";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
-import { formatCurrency, cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
 import { FREE_LIMITS } from "@/lib/features";
 import { GoalCelebration, checkGoalMilestone } from "@/components/goal-celebration";
@@ -17,18 +17,14 @@ import { EditGoalModal } from "@/components/edit-goal-modal";
 import { DeleteGoalModal } from "@/components/delete-goal-modal";
 import { Goal } from "@/types";
 import { AddMoneyToGoalModal } from "@/components/add-money-to-goal-modal";
-import Link from "next/link";
-import { 
-  Plus, 
-  ArrowRight, 
+import {
+  Plus,
   Target,
   TrendingUp,
   Calendar,
   DollarSign,
   MoreHorizontal,
   CheckCircle,
-  Pause,
-  Play,
   Crown
 } from "lucide-react";
 
@@ -532,18 +528,22 @@ export default function GoalsPage() {
       />
 
       {/* Edit Goal Modal */}
-      <EditGoalModal
-        goal={goalToEdit}
-        isOpen={!!goalToEdit}
-        onClose={() => setGoalToEdit(null)}
-      />
+      {goalToEdit && (
+        <EditGoalModal
+          goal={goalToEdit}
+          isOpen={!!goalToEdit}
+          onClose={() => setGoalToEdit(null)}
+        />
+      )}
 
       {/* Delete Goal Modal */}
-      <DeleteGoalModal
-        goal={goalToDelete}
-        isOpen={!!goalToDelete}
-        onClose={() => setGoalToDelete(null)}
-      />
+      {goalToDelete && (
+        <DeleteGoalModal
+          goal={goalToDelete}
+          isOpen={!!goalToDelete}
+          onClose={() => setGoalToDelete(null)}
+        />
+      )}
     </div>
   );
 }
