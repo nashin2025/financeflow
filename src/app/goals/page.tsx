@@ -305,9 +305,9 @@ export default function GoalsPage() {
                       </div>
                       <DropdownMenu
                         trigger={
-                          <button type="button" className="p-2 rounded-lg hover:bg-white/10 transition-colors">
+                          <div className="p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer">
                             <MoreHorizontal className="h-4 w-4 text-foreground-secondary" />
-                          </button>
+                          </div>
                         }
                          items={[
                            { label: "Edit", onClick: () => setGoalToEdit(goal) },
