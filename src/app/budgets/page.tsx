@@ -13,6 +13,9 @@ import { useAppStore } from "@/stores/app-store";
 import { FREE_LIMITS } from "@/lib/features";
 import { EditBudgetModal } from "@/components/edit-budget-modal";
 import { DeleteBudgetModal } from "@/components/delete-budget-modal";
+import { BudgetDetailsModal } from "@/components/budget-details-modal";
+import { BudgetDetailsModal } from "@/components/budget-details-modal";
+import { BudgetDetailsModal } from "@/components/budget-details-modal";
 import Link from "next/link";
 import {
   Plus,
@@ -35,6 +38,9 @@ export default function BudgetsPage() {
   const [showUpgradeMsg, setShowUpgradeMsg] = useState(false);
   const [editingBudget, setEditingBudget] = useState<any>(null);
   const [deletingBudget, setDeletingBudget] = useState<any>(null);
+  const [showBudgetDetails, setShowBudgetDetails] = useState(false);
+  const [showBudgetDetails, setShowBudgetDetails] = useState(false);
+  const [showBudgetDetails, setShowBudgetDetails] = useState(false);
   
   const remainingBudgets = isPremium ? Infinity : Math.max(0, FREE_LIMITS.budgets - budgets.length);
   
@@ -93,6 +99,34 @@ export default function BudgetsPage() {
       <div className="lg:hidden">
         <BottomNav />
       </div>
+
+      {/* Budget Details Modal */}
+      <BudgetDetailsModal
+        isOpen={showBudgetDetails}
+        onClose={() => setShowBudgetDetails(false)}
+        onEditBudget={(id) => {
+          const budget = budgets.find(b => b.id === id);
+          if (budget) setEditingBudget(budget);
+        }}
+        onDeleteBudget={(id) => {
+          const budget = budgets.find(b => b.id === id);
+          if (budget) setDeletingBudget(budget);
+        }}
+      />
+
+      {/* Budget Details Modal */}
+      <BudgetDetailsModal
+        isOpen={showBudgetDetails}
+        onClose={() => setShowBudgetDetails(false)}
+        onEditBudget={(id) => {
+          const budget = budgets.find(b => b.id === id);
+          if (budget) setEditingBudget(budget);
+        }}
+        onDeleteBudget={(id) => {
+          const budget = budgets.find(b => b.id === id);
+          if (budget) setDeletingBudget(budget);
+        }}
+      />
 
       {/* Upgrade Modal */}
       {showUpgradeMsg && (
@@ -245,9 +279,9 @@ export default function BudgetsPage() {
           <Card variant="glass">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-lg font-semibold">Category Budgets</CardTitle>
-              <Link href="/budgets" className="text-sm text-primary-start hover:underline flex items-center">
+              <button onClick={() => setShowBudgetDetails(true)} className="text-sm text-primary-start hover:underline flex items-center">
                 View All <ArrowRight className="h-4 w-4 ml-1" />
-              </Link>
+              </button>
             </CardHeader>
             <CardContent className="space-y-4">
               {budgets.map((budget) => {
@@ -422,6 +456,48 @@ export default function BudgetsPage() {
         budget={deletingBudget}
         isOpen={!!deletingBudget}
         onClose={() => setDeletingBudget(null)}
+      />
+
+      {/* Budget Details Modal */}
+      <BudgetDetailsModal
+        isOpen={showBudgetDetails}
+        onClose={() => setShowBudgetDetails(false)}
+        onEditBudget={(id) => {
+          const budget = budgets.find(b => b.id === id);
+          if (budget) setEditingBudget(budget);
+        }}
+        onDeleteBudget={(id) => {
+          const budget = budgets.find(b => b.id === id);
+          if (budget) setDeletingBudget(budget);
+        }}
+      />
+
+      {/* Budget Details Modal */}
+      <BudgetDetailsModal
+        isOpen={showBudgetDetails}
+        onClose={() => setShowBudgetDetails(false)}
+        onEditBudget={(id) => {
+          const budget = budgets.find(b => b.id === id);
+          if (budget) setEditingBudget(budget);
+        }}
+        onDeleteBudget={(id) => {
+          const budget = budgets.find(b => b.id === id);
+          if (budget) setDeletingBudget(budget);
+        }}
+      />
+
+      {/* Budget Details Modal */}
+      <BudgetDetailsModal
+        isOpen={showBudgetDetails}
+        onClose={() => setShowBudgetDetails(false)}
+        onEditBudget={(id) => {
+          const budget = budgets.find(b => b.id === id);
+          if (budget) setEditingBudget(budget);
+        }}
+        onDeleteBudget={(id) => {
+          const budget = budgets.find(b => b.id === id);
+          if (budget) setDeletingBudget(budget);
+        }}
       />
 
       {/* Upgrade Modal */}
