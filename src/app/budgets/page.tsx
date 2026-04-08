@@ -14,8 +14,6 @@ import { FREE_LIMITS } from "@/lib/features";
 import { EditBudgetModal } from "@/components/edit-budget-modal";
 import { DeleteBudgetModal } from "@/components/delete-budget-modal";
 import { BudgetDetailsModal } from "@/components/budget-details-modal";
-import { BudgetDetailsModal } from "@/components/budget-details-modal";
-import { BudgetDetailsModal } from "@/components/budget-details-modal";
 import Link from "next/link";
 import {
   Plus,
@@ -38,8 +36,6 @@ export default function BudgetsPage() {
   const [showUpgradeMsg, setShowUpgradeMsg] = useState(false);
   const [editingBudget, setEditingBudget] = useState<any>(null);
   const [deletingBudget, setDeletingBudget] = useState<any>(null);
-  const [showBudgetDetails, setShowBudgetDetails] = useState(false);
-  const [showBudgetDetails, setShowBudgetDetails] = useState(false);
   const [showBudgetDetails, setShowBudgetDetails] = useState(false);
   
   const remainingBudgets = isPremium ? Infinity : Math.max(0, FREE_LIMITS.budgets - budgets.length);
