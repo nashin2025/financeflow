@@ -511,6 +511,39 @@ export default function GoalsPage() {
           </div>
         </div>
       )}
+
+      {/* Add Money to Goal Modal */}
+      <AddMoneyToGoalModal
+        goal={selectedGoal}
+        isOpen={!!selectedGoal && !showDetailsModal}
+        onClose={() => setSelectedGoal(null)}
+      />
+
+      {/* Goal Details Modal */}
+      <GoalDetailsModal
+        goal={selectedGoal}
+        isOpen={!!selectedGoal && showDetailsModal}
+        onClose={() => {
+          setSelectedGoal(null);
+          setShowDetailsModal(false);
+        }}
+        onEdit={handleEditGoal}
+        onDelete={handleDeleteGoal}
+      />
+
+      {/* Edit Goal Modal */}
+      <EditGoalModal
+        goal={goalToEdit}
+        isOpen={!!goalToEdit}
+        onClose={() => setGoalToEdit(null)}
+      />
+
+      {/* Delete Goal Modal */}
+      <DeleteGoalModal
+        goal={goalToDelete}
+        isOpen={!!goalToDelete}
+        onClose={() => setGoalToDelete(null)}
+      />
     </div>
   );
 }
