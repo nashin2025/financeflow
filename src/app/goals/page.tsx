@@ -41,6 +41,24 @@ export default function GoalsPage() {
   const [goalToDelete, setGoalToDelete] = React.useState<Goal | null>(null);
   const [showDetailsModal, setShowDetailsModal] = React.useState(false);
 
+  const handleAddMoney = React.useCallback((goal: Goal) => {
+    setSelectedGoal(goal);
+    setShowDetailsModal(false);
+  }, []);
+
+  const handleViewDetails = React.useCallback((goal: Goal) => {
+    setSelectedGoal(goal);
+    setShowDetailsModal(true);
+  }, []);
+
+  const handleEditGoal = React.useCallback((goal: Goal) => {
+    setGoalToEdit(goal);
+  }, []);
+
+  const handleDeleteGoal = React.useCallback((goal: Goal) => {
+    setGoalToDelete(goal);
+  }, []);
+
   // Check for goal milestones
   React.useEffect(() => {
     goals.forEach(goal => {
@@ -309,11 +327,11 @@ export default function GoalsPage() {
                             <MoreHorizontal className="h-4 w-4 text-foreground-secondary" />
                           </div>
                         }
-                         items={[
-                           { label: "Edit", onClick: () => setGoalToEdit(goal) },
-                           { label: "Delete", onClick: () => setGoalToDelete(goal), variant: "destructive" as const },
-                         ]}
-                      />
+                          items={[
+                            { label: "Edit", onClick: () => handleEditGoal(goal) },
+                            { label: "Delete", onClick: () => handleDeleteGoal(goal), variant: "destructive" as const },
+                          ]}
+                       />
                     </div>
                     
                     <div className="flex items-end justify-between mb-3">
@@ -357,17 +375,14 @@ export default function GoalsPage() {
                       </div>
                     )}
                     
-                     <div className="mt-3 flex gap-2">
-                       <Button variant="secondary" size="sm" className="flex-1" onClick={() => setSelectedGoal(goal)}>
-                         Add Money
-                       </Button>
-                        <Button variant="ghost" size="sm" onClick={() => {
-                          setSelectedGoal(goal);
-                          setShowDetailsModal(true);
-                        }}>
-                          View Details
+                      <div className="mt-3 flex gap-2">
+                        <Button variant="secondary" size="sm" className="flex-1" onClick={() => handleAddMoney(goal)}>
+                          Add Money
                         </Button>
-                     </div>
+                         <Button variant="ghost" size="sm" onClick={() => handleViewDetails(goal)}>
+                           View Details
+                         </Button>
+                      </div>
                   </div>
                 );
               })}
