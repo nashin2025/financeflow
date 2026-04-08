@@ -34,7 +34,7 @@ export default function TermsOfServicePage() {
             <h2 className="text-2xl font-semibold text-foreground mb-4">Service Description</h2>
             <p className="mb-4">
               FinanceFlow provides personal finance management tools including transaction tracking,
-              budgeting, goal setting, and financial analytics. The service is provided "as is" and
+               budgeting, goal setting, and financial analytics. The service is provided &quot;as is&quot; and
               we make no warranties regarding its accuracy or reliability for financial decision making.
             </p>
           </section>

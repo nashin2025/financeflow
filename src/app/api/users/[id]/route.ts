@@ -7,7 +7,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const body = await request.json()
     const { isPremium, name } = body
 
-    const updateData: any = {}
+    const updateData: Record<string, unknown> = {}
 
     if (isPremium !== undefined) updateData.isPremium = isPremium
     if (name !== undefined) updateData.name = name

@@ -117,7 +117,7 @@ export function DeleteGoalModal({ goal, isOpen, onClose }: DeleteGoalModalProps)
         {/* Confirmation */}
         <div className="mb-6">
           <p className="text-sm text-foreground-secondary mb-2">
-            Type <strong>"DELETE"</strong> to confirm:
+            Type <strong>&quot;DELETE&quot;</strong> to confirm:
           </p>
           <input
             type="text"

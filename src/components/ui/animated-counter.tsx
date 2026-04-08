@@ -42,7 +42,7 @@ export function AnimatedCounter({ value, duration = 1000, currency = "MVR", clas
         cancelAnimationFrame(frameRef.current);
       }
     };
-  }, [value, duration]);
+  }, [value, duration, displayValue]);
 
   return (
     <span className={className}>

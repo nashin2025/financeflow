@@ -15,22 +15,20 @@ import { EditAccountModal } from "@/components/edit-account-modal";
 import { DeleteAccountModal } from "@/components/delete-account-modal";
 import { BankConnectionModal } from "@/components/bank-connection-modal";
 import { TransactionHistoryModal } from "@/components/transaction-history-modal";
-import { 
-  Plus, 
+import {
+  Plus,
   Landmark,
   TrendingUp,
   MoreHorizontal,
   RefreshCw,
-  Link as LinkIcon,
-  Pencil,
-  Trash2
+  Link as LinkIcon
 } from "lucide-react";
 import Link from "next/link";
 
 export default function AccountsPage() {
   const { accounts } = useAppStore();
-  const [editingAccount, setEditingAccount] = React.useState<any>(null);
-  const [deletingAccount, setDeletingAccount] = React.useState<any>(null);
+  const [editingAccount, setEditingAccount] = React.useState<Account | null>(null);
+  const [deletingAccount, setDeletingAccount] = React.useState<Account | null>(null);
   const [syncingAccountId, setSyncingAccountId] = React.useState<string | null>(null);
   const [showBankConnection, setShowBankConnection] = React.useState(false);
   const [showTransactionHistory, setShowTransactionHistory] = React.useState<Account | null>(null);

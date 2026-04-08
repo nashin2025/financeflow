@@ -19,13 +19,10 @@ export function TransactionHistoryModal({ account, isOpen, onClose }: Transactio
   const [sortBy, setSortBy] = React.useState<'date' | 'amount'>('date');
   const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('desc');
 
-  if (!account) return null;
-
-  // Filter transactions for this account
-  const accountTransactions = transactions.filter(t => t.accountId === account.id);
-
   // Sort transactions
   const sortedTransactions = React.useMemo(() => {
+    if (!account) return [];
+    const accountTransactions = transactions.filter(t => t.accountId === account.id);
     return [...accountTransactions].sort((a, b) => {
       let comparison = 0;
 
@@ -37,7 +34,9 @@ export function TransactionHistoryModal({ account, isOpen, onClose }: Transactio
 
       return sortOrder === 'asc' ? comparison : -comparison;
     });
-  }, [accountTransactions, sortBy, sortOrder]);
+  }, [account, transactions, sortBy, sortOrder]);
+
+  if (!account) return null;
 
   const getCategoryInfo = (categoryId: string) => {
     const category = categories.find(c => c.id === categoryId);

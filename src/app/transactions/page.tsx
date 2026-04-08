@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
+import { Transaction } from "@/types";
 import { EditTransactionModal } from "@/components/edit-transaction-modal";
 import {
   Search,
@@ -39,7 +40,7 @@ export default function TransactionsPage() {
   const [expandedDate, setExpandedDate] = React.useState<string | null>(null);
   const [selectionMode, setSelectionMode] = React.useState(false);
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
-  const [editingTransaction, setEditingTransaction] = React.useState<any>(null);
+  const [editingTransaction, setEditingTransaction] = React.useState<Transaction | null>(null);
 
   const getCategoryInfo = (categoryId: string) => {
     const category = categories.find(c => c.id === categoryId);

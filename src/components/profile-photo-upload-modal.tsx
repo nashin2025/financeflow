@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/stores/app-store";
@@ -105,9 +106,11 @@ export function ProfilePhotoUploadModal({ user, isOpen, onClose }: ProfilePhotoU
         {/* Current/Preview Avatar */}
         <div className="mb-6">
           <div className="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden border-4 border-white/10">
-            <img
+            <Image
               src={previewUrl || user?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=default`}
               alt="Profile preview"
+              width={96}
+              height={96}
               className="w-full h-full object-cover"
             />
           </div>

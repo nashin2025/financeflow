@@ -55,7 +55,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     }
 
     checkAuth();
-  }, []);
+  }, [logout, pathname, router, setPremium, setUser]);
 
   if (isChecking) {
     return (

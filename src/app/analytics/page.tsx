@@ -132,6 +132,7 @@ export default function AnalyticsPage() {
     return content;
   };
 
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const monthlyData = React.useMemo(() => {
     const last6Months = [];
     for (let i = 5; i >= 0; i--) {

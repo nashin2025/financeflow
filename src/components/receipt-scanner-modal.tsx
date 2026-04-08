@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,14 +11,14 @@ import { Camera, Upload, Scan, Loader2 } from "lucide-react";
 interface ReceiptScannerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onScanComplete?: (transactionData: any) => void;
+  onScanComplete?: (transactionData: unknown) => void;
 }
 
 export function ReceiptScannerModal({ isOpen, onClose, onScanComplete }: ReceiptScannerModalProps) {
   const [selectedImage, setSelectedImage] = React.useState<File | null>(null);
   const [imagePreview, setImagePreview] = React.useState<string | null>(null);
   const [isScanning, setIsScanning] = React.useState(false);
-  const [scanResult, setScanResult] = React.useState<any>(null);
+  const [scanResult, setScanResult] = React.useState<unknown>(null);
   const [error, setError] = React.useState("");
   const { categories, accounts, addTransaction } = useAppStore();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -164,10 +165,13 @@ export function ReceiptScannerModal({ isOpen, onClose, onScanComplete }: Receipt
         {imagePreview && !scanResult && (
           <div className="space-y-4">
             <div className="relative">
-              <img
+              <Image
                 src={imagePreview}
                 alt="Receipt preview"
-                className="w-full max-h-64 object-contain rounded-lg bg-white/5"
+                width={400}
+                height={256}
+                className="w-full max-h-64 rounded-lg bg-white/5"
+                style={{ objectFit: 'contain' }}
               />
             </div>
 

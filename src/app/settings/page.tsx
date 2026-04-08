@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/stores/app-store";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { Transaction, Account, Category } from "@/types";
 import { PremiumLock } from "@/components/premium-lock";
 import { EditProfileModal } from "@/components/edit-profile-modal";
 import { ConnectedAccountsModal } from "@/components/connected-accounts-modal";
@@ -137,7 +138,7 @@ export default function SettingsPage() {
     setShowExportModal(false);
   };
 
-  const generatePDFReport = (transactions: any[], accounts: any[], categories: any[]) => {
+  const generatePDFReport = (transactions: Transaction[], accounts: Account[], categories: Category[]) => {
     const totalIncome = transactions
       .filter(t => t.type === 'income')
       .reduce((sum, t) => sum + t.amount, 0);

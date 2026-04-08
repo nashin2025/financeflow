@@ -82,7 +82,7 @@ export function FilterModal({ isOpen, onClose, filters, onFiltersChange }: Filte
                   name="dateRange"
                   value={option.value}
                   checked={tempFilters.dateRange === option.value}
-                  onChange={(e) => setTempFilters(prev => ({ ...prev, dateRange: e.target.value as any }))}
+                  onChange={(e) => setTempFilters(prev => ({ ...prev, dateRange: e.target.value as 'all' | 'last7days' | 'last30days' | 'last90days' | 'thisYear' }))}
                   className="text-primary-start focus:ring-primary-start"
                 />
                 <span className="text-foreground">{option.label}</span>
@@ -106,7 +106,7 @@ export function FilterModal({ isOpen, onClose, filters, onFiltersChange }: Filte
                   name="type"
                   value={option.value}
                   checked={tempFilters.type === option.value}
-                  onChange={(e) => setTempFilters(prev => ({ ...prev, type: e.target.value as any }))}
+                  onChange={(e) => setTempFilters(prev => ({ ...prev, type: e.target.value as 'all' | 'expense' | 'income' }))}
                   className="text-primary-start focus:ring-primary-start"
                 />
                 <span className="text-foreground text-sm">{option.label}</span>

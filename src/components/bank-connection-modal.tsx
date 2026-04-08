@@ -161,7 +161,7 @@ export function BankConnectionModal({ isOpen, onClose }: BankConnectionModalProp
 
           {filteredBanks.length === 0 && searchQuery && (
             <div className="text-center py-8">
-              <p className="text-foreground-secondary">No banks found matching "{searchQuery}"</p>
+              <p className="text-foreground-secondary">No banks found matching &quot;{searchQuery}&quot;</p>
             </div>
           )}
         </div>

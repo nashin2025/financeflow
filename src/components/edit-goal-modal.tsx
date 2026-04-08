@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/stores/app-store";
 import { formatCurrency } from "@/lib/utils";
+import { GoalType } from "@/types";
 import { Loader2, Target, Calendar, DollarSign, Palette, Smile } from "lucide-react";
 
 interface EditGoalModalProps {
@@ -109,7 +110,7 @@ export function EditGoalModal({ goal, isOpen, onClose }: EditGoalModalProps) {
     try {
       const updatedGoal = {
         name: formData.name.trim(),
-        type: formData.type as any,
+        type: formData.type as GoalType,
         targetAmount: parseFloat(formData.targetAmount),
         targetDate: formData.targetDate,
         monthlyContribution: parseFloat(formData.monthlyContribution) || 0,

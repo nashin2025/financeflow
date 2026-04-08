@@ -13,7 +13,7 @@ export async function PUT(request: Request) {
     const body = await request.json()
     const { currentAmount, name, type, targetAmount, targetDate, monthlyContribution, icon, color } = body
 
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       updatedAt: new Date(),
     };
 

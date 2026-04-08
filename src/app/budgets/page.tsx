@@ -11,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { formatCurrency, formatPercentage, cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
 import { FREE_LIMITS } from "@/lib/features";
+import { Budget } from "@/types";
 import { EditBudgetModal } from "@/components/edit-budget-modal";
 import { DeleteBudgetModal } from "@/components/delete-budget-modal";
 import { BudgetDetailsModal } from "@/components/budget-details-modal";
@@ -35,8 +36,8 @@ export default function BudgetsPage() {
   const { budgets, categories, transactions, isPremium } = useAppStore();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [showUpgradeMsg, setShowUpgradeMsg] = useState(false);
-  const [editingBudget, setEditingBudget] = useState<any>(null);
-  const [deletingBudget, setDeletingBudget] = useState<any>(null);
+  const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
+  const [deletingBudget, setDeletingBudget] = useState<Budget | null>(null);
   const [showBudgetDetails, setShowBudgetDetails] = useState(false);
   
   const remainingBudgets = isPremium ? Infinity : Math.max(0, FREE_LIMITS.budgets - budgets.length);

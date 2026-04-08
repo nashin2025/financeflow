@@ -5,7 +5,7 @@ import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/stores/app-store";
 import { formatCurrency, cn } from "@/lib/utils";
-import { Pencil, Trash2, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
+import { Pencil, Trash, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 
 interface BudgetDetailsModalProps {
   isOpen: boolean;
@@ -19,7 +19,7 @@ export function BudgetDetailsModal({ isOpen, onClose, onEditBudget, onDeleteBudg
 
   const getCategoryInfo = (categoryId: string) => {
     const category = categories.find(c => c.id === categoryId);
-    return category || { name: "Other", icon: "\ud83d\udce6", color: "#9CA3AF" };
+    return category || { name: "Other", icon: "📦", color: "#9CA3AF" };
   };
 
   const getBudgetStatus = (percentage: number) => {
@@ -43,7 +43,7 @@ export function BudgetDetailsModal({ isOpen, onClose, onEditBudget, onDeleteBudg
       <div className="space-y-6">
         <div className="text-center">
           <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center text-2xl font-bold text-white mx-auto mb-4">
-            \ud83d\udcca
+            📊
           </div>
           <h2 className="text-xl font-bold text-foreground mb-2">All Budget Details</h2>
           <p className="text-foreground-secondary">Comprehensive overview of all your budget categories</p>
@@ -105,7 +105,7 @@ export function BudgetDetailsModal({ isOpen, onClose, onEditBudget, onDeleteBudg
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
                       <Button variant="ghost" size="sm" onClick={() => { onClose(); onDeleteBudget(budget.id); }} className="h-8 w-8 p-0 text-error hover:text-error">
-                        <Trash2 className="h-3.5 w-3.5" />
+                        <Trash className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </div>
