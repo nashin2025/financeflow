@@ -30,16 +30,9 @@ export function DropdownMenu({ trigger, items, className }: DropdownMenuProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const triggerWithClick = React.cloneElement(trigger as React.ReactElement, {
-    onClick: (e: React.MouseEvent) => {
-      e.stopPropagation();
-      setIsOpen(!isOpen);
-    }
-  });
-
   return (
     <div className={cn("relative", className)} ref={menuRef}>
-      {triggerWithClick}
+      <div onClick={() => setIsOpen(!isOpen)}>{trigger}</div>
       {isOpen && (
         <div className="absolute right-0 z-50 mt-2 w-48 py-2 rounded-xl bg-background-elevated border border-white/10 shadow-lg shadow-black/20 overflow-hidden animate-fadeIn">
           {items.map((item, index) => (
