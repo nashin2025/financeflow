@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/stores/app-store";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { Transaction, Account, Category } from "@/types";
 import { PremiumLock } from "@/components/premium-lock";
 import { EditProfileModal } from "@/components/edit-profile-modal";
@@ -150,9 +150,13 @@ export default function SettingsPage() {
     let content = `FinanceFlow Financial Report\n`;
     content += `Generated on: ${new Date().toLocaleDateString()}\n\n`;
     content += `SUMMARY\n`;
-    content += `Total Income: $${totalIncome.toFixed(2)}\n`;
-    content += `Total Expenses: $${totalExpenses.toFixed(2)}\n`;
-    content += `Net: $${(totalIncome - totalExpenses).toFixed(2)}\n\n`;
+    content += `Total Income: ${formatCurrency(totalIncome, currency)}
+`;
+    content += `Total Expenses: ${formatCurrency(totalExpenses, currency)}
+`;
+    content += `Net: ${formatCurrency(totalIncome - totalExpenses, currency)}
+
+`;
     content += `RECENT TRANSACTIONS\n`;
     content += `Date\t\tType\t\tAmount\t\tDescription\n`;
     content += `-`.repeat(80) + `\n`;
@@ -160,7 +164,7 @@ export default function SettingsPage() {
     transactions.slice(0, 20).forEach(t => {
       const date = new Date(t.date).toLocaleDateString();
       const type = t.type.charAt(0).toUpperCase() + t.type.slice(1);
-      const amount = `$${t.amount.toFixed(2)}`;
+      const amount = formatCurrency(t.amount, currency);
       content += `${date}\t${type}\t\t${amount}\t${t.description || 'N/A'}\n`;
     });
 

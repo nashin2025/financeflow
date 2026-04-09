@@ -25,7 +25,7 @@ export function AddMoneyToGoalModal({ goal, isOpen, onClose }: AddMoneyToGoalMod
   const [amount, setAmount] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState("");
-  const { updateGoal } = useAppStore();
+  const { updateGoal, syncGoals } = useAppStore();
 
 
 
@@ -59,10 +59,15 @@ export function AddMoneyToGoalModal({ goal, isOpen, onClose }: AddMoneyToGoalMod
         },
         body: JSON.stringify({ currentAmount: newCurrentAmount }),
       });
-
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('API Error:', response.status, errorData);
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+        console.error("API Error:", response.status, errorData);
+        
+        if (response.status === 404 && errorData.error === "Goal not found") {
+          await syncGoals();
+          throw new Error("Goal not found. Please refresh and try again.");
+        }
+        
         throw new Error(errorData?.error || `Failed to update goal (${response.status})`);
       }
 

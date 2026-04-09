@@ -57,6 +57,7 @@ interface AppState {
   deleteBudget: (id: string) => void;
   
   setGoals: (goals: Goal[]) => void;
+   syncGoals: () => Promise<void>;
   addGoal: (goal: Goal) => void;
   updateGoal: (id: string, data: Partial<Goal>) => void;
   deleteGoal: (id: string) => void;
@@ -304,6 +305,17 @@ export const useAppStore = create<AppState>((set, get) => ({
       )
     }));
     saveToStorage(get());
+  },
+  syncGoals: async () => {
+    try {
+      const response = await fetch('/api/goals');
+      if (response.ok) {
+        const data = await response.json();
+        set({ goals: data.goals || [] });
+      }
+    } catch (error) {
+      console.error('Failed to sync goals:', error);
+    }
   },
   deleteGoal: (id) => {
     set((state) => ({
