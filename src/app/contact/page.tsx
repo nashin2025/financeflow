@@ -44,7 +44,7 @@ const supportOptions = [
   {
     icon: <Mail className="h-5 w-5" />,
     title: "Email Support",
-    description: "Send us a detailed message and we'll respond within 24 hours",
+    description: "Send us a detailed message and wewe'llapos;ll respond within 24 hours",
     available: "24/7",
     action: "Send Email",
     onClick: () => window.open("mailto:support@financeflow.app", "_blank")
@@ -166,7 +166,7 @@ export default function ContactSupportPage() {
                 Send us a Message
               </CardTitle>
               <CardDescription>
-                Fill out the form below and we'll get back to you as soon as possible.
+                Fill out the form below and wewe'llapos;ll get back to you as soon as possible.
               </CardDescription>
             </CardHeader>
             <CardContent>

@@ -13,22 +13,24 @@ export function recalculateBudgetSpent(
   categories: Category[]
 ): Budget[] {
   const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
 
   return budgets.map(budget => {
     // Find the category for this budget
     const category = categories.find(c => c.id === budget.categoryId);
     if (!category) return budget;
 
-    // Get transactions for this category in the current month
+    // Calculate the date range for this budget period
+    const startDate = getBudgetPeriodStart(budget, now);
+    const endDate = getBudgetPeriodEnd(budget, now);
+
+    // Get transactions for this category within the budget period
     const categoryTransactions = transactions.filter(t => {
       const transactionDate = new Date(t.date);
       return (
         t.categoryId === budget.categoryId &&
         t.type === 'expense' &&
-        transactionDate.getMonth() === currentMonth &&
-        transactionDate.getFullYear() === currentYear
+        transactionDate >= startDate &&
+        transactionDate <= endDate
       );
     });
 
@@ -42,6 +44,66 @@ export function recalculateBudgetSpent(
       remaining: Math.max(0, remaining) // Ensure remaining doesn't go negative
     };
   });
+}
+
+function getBudgetPeriodStart(budget: Budget, currentDate: Date): Date {
+  switch (budget.period) {
+    case 'weekly':
+      const weekStart = new Date(currentDate);
+      weekStart.setDate(currentDate.getDate() - currentDate.getDay());
+      weekStart.setHours(0, 0, 0, 0);
+      return weekStart;
+    
+    case 'biweekly':
+      const biweeklyStart = new Date(currentDate);
+      const dayOfWeek = currentDate.getDay();
+      const daysSinceStart = dayOfWeek;
+      biweeklyStart.setDate(currentDate.getDate() - daysSinceStart);
+      biweeklyStart.setHours(0, 0, 0, 0);
+      return biweeklyStart;
+    
+    case 'monthly':
+      return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    
+    case 'quarterly':
+      const quarter = Math.floor(currentDate.getMonth() / 3);
+      return new Date(currentDate.getFullYear(), quarter * 3, 1);
+    
+    case 'yearly':
+      return new Date(currentDate.getFullYear(), 0, 1);
+    
+    default:
+      return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  }
+}
+
+function getBudgetPeriodEnd(budget: Budget, currentDate: Date): Date {
+  switch (budget.period) {
+    case 'weekly':
+      const weekEnd = getBudgetPeriodStart(budget, currentDate);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+      weekEnd.setHours(23, 59, 59, 999);
+      return weekEnd;
+    
+    case 'biweekly':
+      const biweeklyEnd = getBudgetPeriodStart(budget, currentDate);
+      biweeklyEnd.setDate(biweeklyEnd.getDate() + 13);
+      biweeklyEnd.setHours(23, 59, 59, 999);
+      return biweeklyEnd;
+    
+    case 'monthly':
+      return new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999);
+    
+    case 'quarterly':
+      const quarterEnd = new Date(currentDate.getFullYear(), Math.floor(currentDate.getMonth() / 3) * 3 + 3, 0, 23, 59, 59, 999);
+      return quarterEnd;
+    
+    case 'yearly':
+      return new Date(currentDate.getFullYear(), 11, 31, 23, 59, 59, 999);
+    
+    default:
+      return new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999);
+  }
 }
 
 /**
@@ -77,7 +139,6 @@ export function recalculateAccountBalances(
  */
 export function recalculateGoalProgress(
   goals: Goal[],
-  transactions: Transaction[]
 ): Goal[] {
   // For now, goals are manually updated, but this could be extended
   // to automatically track savings transactions toward goals

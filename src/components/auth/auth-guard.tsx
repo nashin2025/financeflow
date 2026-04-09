@@ -29,7 +29,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
             name: data.user.name,
           });
           setPremium(data.user.isPremium ?? false);
-          setPremium(data.user.isPremium ?? false);
 
           if (publicPaths.includes(pathname)) {
             router.replace("/");

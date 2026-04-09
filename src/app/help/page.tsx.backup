@@ -1,0 +1,318 @@
+"use client";
+
+import * as React from "react";
+import { Sidebar } from "@/components/layout/sidebar";
+import { BottomNav } from "@/components/layout/bottom-nav";
+import { Header } from "@/components/layout/header";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { 
+  Search, 
+  BookOpen, 
+  HelpCircle, 
+  MessageCircle, 
+  ChevronRight,
+  Lightbulb,
+  AlertTriangle,
+  CheckCircle
+} from "lucide-react";
+
+interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+const faqs: FAQItem[] = [
+  {
+    question: "How do I add a new transaction?",
+    answer: "Tap the '+' button on the home screen, select the transaction type (income or expense), choose a category, enter the amount, and add any notes. The transaction will be automatically saved and reflected in your dashboard."
+  },
+  {
+    question: "How can I set up recurring transactions?",
+    answer: "Go to Settings > Transactions > Recurring. Add a new recurring transaction by specifying the amount, frequency (daily, weekly, monthly, yearly), category, and start date. FinanceFlow will automatically create these transactions for you."
+  },
+  {
+    question: "How do budgets work?",
+    answer: "Create budgets by category or overall spending limits in the Budgets section. Set monthly or yearly limits, and FinanceFlow will track your progress with visual indicators. You'll receive notifications when you're approaching or exceeding your budget."
+  },
+  {
+    question: "Can I export my financial data?",
+    answer: "Yes, go to Settings > Data > Export Data. You can export your transactions, accounts, and budgets in CSV or PDF format. This is useful for tax purposes or backing up your data."
+  },
+  {
+    question: "How does the AI assistant work?",
+    answer: "Our AI assistant analyzes your spending patterns and provides personalized insights, recommendations, and answers to financial questions. You can ask it questions like 'How much did I spend on groceries this month?' or 'What's my savings rate?'"
+  },
+  {
+    question: "Is my data secure?",
+    answer: "Yes, we use bank-level encryption to protect your financial data. All data is encrypted in transit and at rest, and we follow industry best practices for security. We never share your personal financial information with third parties."
+  },
+  {
+    question: "How do I connect my bank accounts?",
+    answer: "Go to Settings > Connected Accounts > Add Account. Select your bank from our secure list of partners. You'll be redirected to authenticate securely through your bank's official login. We use read-only access and never store your banking credentials."
+  },
+  {
+    question: "Can I categorize transactions automatically?",
+    answer: "Yes, FinanceFlow uses AI to automatically categorize most transactions based on merchant names and transaction details. You can also set up custom rules in Settings > Transactions > Auto-Categorization for specific merchants."
+  }
+];
+
+function FAQSection({ searchQuery }: { searchQuery: string }) {
+  const filteredFaqs = faqs.filter(faq =>
+    faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <HelpCircle className="h-5 w-5" />
+          Frequently Asked Questions
+        </CardTitle>
+        <CardDescription>
+          Find answers to common questions about FinanceFlow
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {filteredFaqs.length === 0 ? (
+          <p className="text-center text-foreground-secondary py-8">
+            No FAQs match your search. Try different keywords or contact support.
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {filteredFaqs.map((faq, index) => (
+              <details key={index} className="group">
+                <summary className="flex items-center justify-between cursor-pointer py-3 font-medium hover:text-primary transition-colors">
+                  <span>{faq.question}</span>
+                  <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" />
+                </summary>
+                <div className="pb-4 pt-2 text-foreground-secondary">
+                  {faq.answer}
+                </div>
+              </details>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function HelpCenterPage() {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = React.useState("");
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Sidebar />
+      <Header title="Help Center" />
+      <BottomNav />
+
+      <main className="lg:pl-64 pb-20 lg:pb-0">
+        <div className="container mx-auto px-4 py-6 max-w-4xl space-y-6">
+          {/* Search */}
+          <Card>
+            <CardContent className="pt-6">
+              <Input
+                placeholder="Search help articles, FAQs, or guides..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                icon={<Search className="h-4 w-4" />}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Getting Started */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Lightbulb className="h-5 w-5" />
+                Getting Started
+              </CardTitle>
+              <CardDescription>
+                New to FinanceFlow? Follow these steps to get started with managing your finances.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <span className="flex items-center justify-center w-6 h-6 bg-primary-start text-white text-sm font-bold rounded-full">1</span>
+                    Create Your Account
+                  </h3>
+                  <div className="ml-8 space-y-2 text-sm text-foreground-secondary">
+                    <p>• Tap the "Sign Up" button on the login screen</p>
+                    <p>• Enter your email address and create a secure password</p>
+                    <p>• Verify your email by clicking the link sent to your inbox</p>
+                    <p>• Complete your profile by adding your name and preferences</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <span className="flex items-center justify-center w-6 h-6 bg-primary-start text-white text-sm font-bold rounded-full">2</span>
+                    Add Your First Transaction
+                  </h3>
+                  <div className="ml-8 space-y-2 text-sm text-foreground-secondary">
+                    <p>• Tap the "+" button in the bottom navigation or dashboard</p>
+                    <p>• Choose "Income" or "Expense" depending on the transaction type</p>
+                    <p>• Select a category (e.g., Food, Transportation, Salary)</p>
+                    <p>• Enter the amount and optional description</p>
+                    <p>• Set the date and tap "Save" to add the transaction</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <span className="flex items-center justify-center w-6 h-6 bg-primary-start text-white text-sm font-bold rounded-full">3</span>
+                    Set Up Budgets
+                  </h3>
+                  <div className="ml-8 space-y-2 text-sm text-foreground-secondary">
+                    <p>• Navigate to the "Budgets" tab from the bottom navigation</p>
+                    <p>• Tap "Create Budget" or the "+" button</p>
+                    <p>• Choose a category or create a custom budget name</p>
+                    <p>• Set your monthly or yearly spending limit</p>
+                    <p>• Enable notifications to get alerts when approaching limits</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+          {/* Troubleshooting */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5" />
+                Troubleshooting
+              </CardTitle>
+              <CardDescription>
+                Common issues and step-by-step solutions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <details className="group border border-white/10 rounded-xl p-4">
+                  <summary className="flex items-center justify-between cursor-pointer font-semibold hover:text-primary transition-colors">
+                    <span className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      App Not Syncing
+                    </span>
+                    <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" />
+                  </summary>
+                  <div className="mt-3 space-y-2 text-sm text-foreground-secondary">
+                    <p><strong>Step 1:</strong> Check your internet connection. Ensure you have a stable Wi-Fi or cellular data connection.</p>
+                    <p><strong>Step 2:</strong> Pull down on the main dashboard to manually refresh your data.</p>
+                    <p><strong>Step 3:</strong> Restart the app by closing it completely and reopening it.</p>
+                    <p><strong>Step 4:</strong> Check Settings > Connected Accounts to ensure your bank connections are active.</p>
+                    <p><strong>Step 5:</strong> If issues persist, try logging out and back in to refresh your session.</p>
+                  </div>
+                </details>
+
+                <details className="group border border-white/10 rounded-xl p-4">
+                  <summary className="flex items-center justify-between cursor-pointer font-semibold hover:text-primary transition-colors">
+                    <span className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      Login Issues
+                    </span>
+                    <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" />
+                  </summary>
+                  <div className="mt-3 space-y-2 text-sm text-foreground-secondary">
+                    <p><strong>Forgot Password:</strong> Tap "Forgot Password" on the login screen and follow the email instructions.</p>
+                    <p><strong>Account Locked:</strong> If your account is temporarily locked due to failed attempts, wait 15 minutes or contact support.</p>
+                    <p><strong>Two-Factor Authentication:</strong> Ensure you have access to your authenticator app or backup codes.</p>
+                    <p><strong>Email Verification:</strong> Check your spam/junk folder for the verification email.</p>
+                    <p><strong>Browser Issues:</strong> Try clearing your browser cache and cookies, or use an incognito window.</p>
+                  </div>
+                </details>
+
+                <details className="group border border-white/10 rounded-xl p-4">
+                  <summary className="flex items-center justify-between cursor-pointer font-semibold hover:text-primary transition-colors">
+                    <span className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      Data Import Problems
+                    </span>
+                    <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" />
+                  </summary>
+                  <div className="mt-3 space-y-2 text-sm text-foreground-secondary">
+                    <p><strong>CSV Format:</strong> Ensure your CSV file has columns for Date, Description, Amount, and Category (optional).</p>
+                    <p><strong>Date Format:</strong> Use MM/DD/YYYY or DD/MM/YYYY format consistently throughout the file.</p>
+                    <p><strong>Amount Format:</strong> Use positive numbers for income, negative for expenses, or include a separate column for transaction type.</p>
+                    <p><strong>File Size:</strong> Large files may take time to process; try splitting into smaller batches if needed.</p>
+                    <p><strong>Encoding:</strong> Save your CSV file as UTF-8 encoding to avoid character issues.</p>
+                  </div>
+                </details>
+
+                <details className="group border border-white/10 rounded-xl p-4">
+                  <summary className="flex items-center justify-between cursor-pointer font-semibold hover:text-primary transition-colors">
+                    <span className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      Budget Alerts Not Working
+                    </span>
+                    <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" />
+                  </summary>
+                  <div className="mt-3 space-y-2 text-sm text-foreground-secondary">
+                    <p><strong>Check Settings:</strong> Go to Settings > Notifications and ensure budget alerts are enabled.</p>
+                    <p><strong>App Permissions:</strong> Grant notification permissions for FinanceFlow in your device settings.</p>
+                    <p><strong>Budget Thresholds:</strong> Verify your budget has appropriate warning thresholds set (e.g., 80% of limit).</p>
+                    <p><strong>Time Zone:</strong> Ensure your device time zone matches your expected notification timing.</p>
+                    <p><strong>Do Not Disturb:</strong> Check if Do Not Disturb mode is blocking notifications.</p>
+                  </div>
+                </details>
+
+                <details className="group border border-white/10 rounded-xl p-4">
+                  <summary className="flex items-center justify-between cursor-pointer font-semibold hover:text-primary transition-colors">
+                    <span className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      Transaction Categories Wrong
+                    </span>
+                    <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" />
+                  </summary>
+                  <div className="mt-3 space-y-2 text-sm text-foreground-secondary">
+                    <p><strong>Edit Transaction:</strong> Tap on the transaction in the list, then tap the category to change it.</p>
+                    <p><strong>Custom Rules:</strong> Go to Settings > Transactions > Auto-Categorization to set up merchant-specific rules.</p>
+                    <p><strong>Default Categories:</strong> Review and customize your default category list in Settings > Categories.</p>
+                    <p><strong>Bulk Edit:</strong> For multiple transactions, use the select mode to edit several at once.</p>
+                    <p><strong>Report Issues:</strong> For persistent categorization problems, contact support with examples.</p>
+                  </div>
+                </details>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Contact Support */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageCircle className="h-5 w-5" />
+                Still Need Help?
+              </CardTitle>
+              <CardDescription>
+                Can't find what you're looking for? Our support team is here to help.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button 
+                  className="flex-1" 
+                  onClick={() => router.push('/contact')}
+                >
+                  Contact Support
+                </Button>
+                <Button 
+                  variant="secondary" 
+                  className="flex-1"
+                  onClick={() => window.open('mailto:support@financeflow.app', '_blank')}
+                >
+                  Email Support
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    </div>
+  );
+}
