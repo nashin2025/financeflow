@@ -55,7 +55,7 @@ export function recalculateAccountBalances(
     // Get all transactions for this account
     const accountTransactions = transactions.filter(t => t.accountId === account.id);
 
-    // Calculate balance (starting balance + income - expenses)
+    // Calculate balance from scratch: income - expenses
     const balance = accountTransactions.reduce((balance, transaction) => {
       if (transaction.type === 'income') {
         return balance + Number(transaction.amount);
@@ -63,7 +63,7 @@ export function recalculateAccountBalances(
         return balance - Number(transaction.amount);
       }
       return balance;
-    }, Number(account.balance));
+    }, 0);
 
     return {
       ...account,
