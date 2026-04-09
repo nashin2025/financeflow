@@ -1,6 +1,35 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    const type = searchParams.get('type')
+    const limit = parseInt(searchParams.get('limit') || '50')
+    const offset = parseInt(searchParams.get('offset') || '0')
+
+    const where: Record<string, unknown> = {}
+
+    if (id) where.id = id
+    if (type) where.type = type
+
+    const goals = await prisma.goal.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      take: Math.min(limit, 100),
+      skip: offset,
+    })
+
+    const total = await prisma.goal.count({ where })
+
+    return NextResponse.json({ goals, total, limit, offset })
+  } catch (error) {
+    console.error('Error fetching goals:', error)
+    return NextResponse.json({ error: 'Failed to fetch goals' }, { status: 500 })
+  }
+}
+
 export async function PUT(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
@@ -10,8 +39,20 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Goal ID is required' }, { status: 400 })
     }
 
+    // Check if goal exists
+    const existingGoal = await prisma.goal.findUnique({
+      where: { id },
+    });
+
+    if (!existingGoal) {
+      console.error('Goal not found:', id);
+      return NextResponse.json({ error: 'Goal not found' }, { status: 404 });
+    }
+
     const body = await request.json()
     const { currentAmount, name, type, targetAmount, targetDate, monthlyContribution, icon, color } = body
+
+    console.log('Updating goal:', id, { currentAmount, name, type, targetAmount, targetDate, monthlyContribution, icon, color });
 
     const updateData: Record<string, unknown> = {
       updatedAt: new Date(),
@@ -19,15 +60,31 @@ export async function PUT(request: Request) {
 
     // Update currentAmount if provided
     if (currentAmount !== undefined) {
-      updateData.currentAmount = parseFloat(currentAmount);
+      const newAmount = parseFloat(currentAmount);
+      if (isNaN(newAmount)) {
+        return NextResponse.json({ error: 'Invalid currentAmount value' }, { status: 400 });
+      }
+      updateData.currentAmount = newAmount;
     }
 
     // Update other fields if provided (for editing)
     if (name !== undefined) updateData.name = name;
     if (type !== undefined) updateData.type = type;
-    if (targetAmount !== undefined) updateData.targetAmount = parseFloat(targetAmount);
+    if (targetAmount !== undefined) {
+      const target = parseFloat(targetAmount);
+      if (isNaN(target)) {
+        return NextResponse.json({ error: 'Invalid targetAmount value' }, { status: 400 });
+      }
+      updateData.targetAmount = target;
+    }
     if (targetDate !== undefined) updateData.targetDate = new Date(targetDate);
-    if (monthlyContribution !== undefined) updateData.monthlyContribution = parseFloat(monthlyContribution) || 0;
+    if (monthlyContribution !== undefined) {
+      const contrib = parseFloat(monthlyContribution);
+      if (isNaN(contrib)) {
+        return NextResponse.json({ error: 'Invalid monthlyContribution value' }, { status: 400 });
+      }
+      updateData.monthlyContribution = contrib;
+    }
     if (icon !== undefined) updateData.icon = icon;
     if (color !== undefined) updateData.color = color;
 
@@ -35,6 +92,8 @@ export async function PUT(request: Request) {
       where: { id },
       data: updateData,
     })
+
+    console.log('Goal updated successfully:', updatedGoal);
 
     return NextResponse.json({ goal: updatedGoal, message: 'Goal updated' })
   } catch (error) {
