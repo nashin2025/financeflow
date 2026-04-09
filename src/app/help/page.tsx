@@ -52,7 +52,7 @@ export default function HelpCenterPage() {
                 <div>
                   <h3 className="font-semibold mb-3">1. Create Your Account</h3>
                   <div className="ml-4 space-y-1 text-sm text-foreground-secondary">
-                    <p>• Tap "Sign Up" on the login screen</p>
+                    <p>• Tap &quot;Sign Up&quot; on the login screen</p>
                     <p>• Enter email and create secure password</p>
                     <p>• Verify email and complete profile</p>
                   </div>
@@ -61,7 +61,7 @@ export default function HelpCenterPage() {
                 <div>
                   <h3 className="font-semibold mb-3">2. Add Your First Transaction</h3>
                   <div className="ml-4 space-y-1 text-sm text-foreground-secondary">
-                    <p>• Tap "+" button in navigation or dashboard</p>
+                    <p>• Tap &quot;+&quot; button in navigation or dashboard</p>
                     <p>• Choose Income or Expense type</p>
                     <p>• Select category and enter amount</p>
                     <p>• Add description and save</p>
@@ -80,7 +80,7 @@ export default function HelpCenterPage() {
                 <div>
                   <h3 className="font-semibold mb-3">4. Connect Bank Accounts</h3>
                   <div className="ml-4 space-y-1 text-sm text-foreground-secondary">
-                    <p>• Settings &gt; Connected Accounts</p>
+                    <p>• Go to Settings &gt; Connected Accounts</p>
                     <p>• Select bank and authenticate</p>
                     <p>• Grant read-only access</p>
                     <p>• Transactions sync automatically</p>

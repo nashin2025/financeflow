@@ -109,7 +109,7 @@ export default function ContactSupportPage() {
                 <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
                 <h2 className="text-2xl font-semibold mb-2">Support Ticket Submitted!</h2>
                 <p className="text-foreground-secondary mb-6">
-                  Thank you for contacting us. We've received your support request and will get back to you within 24 hours.
+                  Thank you for contacting us. We&apos;ve received your support request and will get back to you within 24 hours.
                 </p>
                 <Button onClick={() => setSubmitted(false)}>
                   Submit Another Request
@@ -166,7 +166,7 @@ export default function ContactSupportPage() {
                 Send us a Message
               </CardTitle>
               <CardDescription>
-                Fill out the form below and wewe'llapos;ll get back to you as soon as possible.
+                Fill out the form below and we&apos;ll get back to you as soon as possible.
               </CardDescription>
             </CardHeader>
             <CardContent>
