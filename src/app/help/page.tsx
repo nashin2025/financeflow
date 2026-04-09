@@ -133,54 +133,55 @@ export default function HelpCenterPage() {
                 Getting Started
               </CardTitle>
               <CardDescription>
-                New to FinanceFlow? Here's how to get started with managing your finances.
+                New to FinanceFlow? Follow these steps to get started with managing your finances.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="p-4 border border-white/10 rounded-xl hover:bg-white/5 transition-colors">
-                  <h3 className="font-semibold mb-2">Create Your Account</h3>
-                  <p className="text-sm text-foreground-secondary mb-3">
-                    Sign up with your email and start tracking your finances immediately.
-                  </p>
-                  <Button variant="ghost" size="sm" className="p-0 h-auto">
-                    Learn More <ChevronRight className="h-3 w-3 ml-1" />
-                  </Button>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <span className="flex items-center justify-center w-6 h-6 bg-primary-start text-white text-sm font-bold rounded-full">1</span>
+                    Create Your Account
+                  </h3>
+                  <div className="ml-8 space-y-2 text-sm text-foreground-secondary">
+                    <p>• Tap the "Sign Up" button on the login screen</p>
+                    <p>• Enter your email address and create a secure password</p>
+                    <p>• Verify your email by clicking the link sent to your inbox</p>
+                    <p>• Complete your profile by adding your name and preferences</p>
+                  </div>
                 </div>
-                <div className="p-4 border border-white/10 rounded-xl hover:bg-white/5 transition-colors">
-                  <h3 className="font-semibold mb-2">Add Your First Transaction</h3>
-                  <p className="text-sm text-foreground-secondary mb-3">
-                    Start by adding income and expenses to see your financial overview.
-                  </p>
-                  <Button variant="ghost" size="sm" className="p-0 h-auto">
-                    Learn More <ChevronRight className="h-3 w-3 ml-1" />
-                  </Button>
-                </div>
-                <div className="p-4 border border-white/10 rounded-xl hover:bg-white/5 transition-colors">
-                  <h3 className="font-semibold mb-2">Set Up Budgets</h3>
-                  <p className="text-sm text-foreground-secondary mb-3">
-                    Create budgets to stay on track with your spending goals.
-                  </p>
-                  <Button variant="ghost" size="sm" className="p-0 h-auto">
-                    Learn More <ChevronRight className="h-3 w-3 ml-1" />
-                  </Button>
-                </div>
-                <div className="p-4 border border-white/10 rounded-xl hover:bg-white/5 transition-colors">
-                  <h3 className="font-semibold mb-2">Connect Bank Accounts</h3>
-                  <p className="text-sm text-foreground-secondary mb-3">
-                    Automatically import transactions from your bank accounts.
-                  </p>
-                  <Button variant="ghost" size="sm" className="p-0 h-auto">
-                    Learn More <ChevronRight className="h-3 w-3 ml-1" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* FAQ */}
-          <FAQSection searchQuery={searchQuery} />
+                <div>
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <span className="flex items-center justify-center w-6 h-6 bg-primary-start text-white text-sm font-bold rounded-full">2</span>
+                    Add Your First Transaction
+                  </h3>
+                  <div className="ml-8 space-y-2 text-sm text-foreground-secondary">
+                    <p>• Tap the "+" button in the bottom navigation or dashboard</p>
+                    <p>• Choose "Income" or "Expense" depending on the transaction type</p>
+                    <p>• Select a category (e.g., Food, Transportation, Salary)</p>
+                    <p>• Enter the amount and optional description</p>
+                    <p>• Set the date and tap "Save" to add the transaction</p>
+                  </div>
+                </div>
 
+                <div>
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <span className="flex items-center justify-center w-6 h-6 bg-primary-start text-white text-sm font-bold rounded-full">3</span>
+                    Set Up Budgets
+                  </h3>
+                  <div className="ml-8 space-y-2 text-sm text-foreground-secondary">
+                    <p>• Navigate to the "Budgets" tab from the bottom navigation</p>
+                    <p>• Tap "Create Budget" or the "+" button</p>
+                    <p>• Choose a category or create a custom budget name</p>
+                    <p>• Set your monthly or yearly spending limit</p>
+                    <p>• Enable notifications to get alerts when approaching limits</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  </h3>
           {/* Troubleshooting */}
           <Card>
             <CardHeader>
@@ -189,47 +190,61 @@ export default function HelpCenterPage() {
                 Troubleshooting
               </CardTitle>
               <CardDescription>
-                Common issues and how to resolve them
+                Common issues and step-by-step solutions
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="p-4 border border-white/10 rounded-xl">
-                  <h3 className="font-semibold mb-2 flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    App Not Syncing
-                  </h3>
-                  <p className="text-sm text-foreground-secondary mb-3">
-                    If your data isn't syncing, check your internet connection and try refreshing the app.
-                  </p>
-                  <Button variant="ghost" size="sm" className="p-0 h-auto">
-                    View Solution <ChevronRight className="h-3 w-3 ml-1" />
-                  </Button>
-                </div>
-                <div className="p-4 border border-white/10 rounded-xl">
-                  <h3 className="font-semibold mb-2 flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Login Issues
-                  </h3>
-                  <p className="text-sm text-foreground-secondary mb-3">
-                    Can't log in? Reset your password or contact support if you're still having issues.
-                  </p>
-                  <Button variant="ghost" size="sm" className="p-0 h-auto">
-                    View Solution <ChevronRight className="h-3 w-3 ml-1" />
-                  </Button>
-                </div>
-                <div className="p-4 border border-white/10 rounded-xl">
-                  <h3 className="font-semibold mb-2 flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Data Import Problems
-                  </h3>
-                  <p className="text-sm text-foreground-secondary mb-3">
-                    Having trouble importing data? Ensure your file is in the correct format and try again.
-                  </p>
-                  <Button variant="ghost" size="sm" className="p-0 h-auto">
-                    View Solution <ChevronRight className="h-3 w-3 ml-1" />
-                  </Button>
-                </div>
+                <details className="group border border-white/10 rounded-xl p-4">
+                  <summary className="flex items-center justify-between cursor-pointer font-semibold hover:text-primary transition-colors">
+                    <span className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      App Not Syncing
+                    </span>
+                    <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" />
+                  </summary>
+                  <div className="mt-3 space-y-2 text-sm text-foreground-secondary">
+                    <p><strong>Step 1:</strong> Check your internet connection. Ensure you have a stable Wi-Fi or cellular data connection.</p>
+                    <p><strong>Step 2:</strong> Pull down on the main dashboard to manually refresh your data.</p>
+                    <p><strong>Step 3:</strong> Restart the app by closing it completely and reopening it.</p>
+                    <p><strong>Step 4:</strong> Check Settings &gt; Connected Accounts to ensure your bank connections are active.</p>
+                    <p><strong>Step 5:</strong> If issues persist, try logging out and back in to refresh your session.</p>
+                  </div>
+                </details>
+
+                <details className="group border border-white/10 rounded-xl p-4">
+                  <summary className="flex items-center justify-between cursor-pointer font-semibold hover:text-primary transition-colors">
+                    <span className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      Login Issues
+                    </span>
+                    <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" />
+                  </summary>
+                  <div className="mt-3 space-y-2 text-sm text-foreground-secondary">
+                    <p><strong>Forgot Password:</strong> Tap "Forgot Password" on the login screen and follow the email instructions.</p>
+                    <p><strong>Account Locked:</strong> If your account is temporarily locked due to failed attempts, wait 15 minutes or contact support.</p>
+                    <p><strong>Two-Factor Authentication:</strong> Ensure you have access to your authenticator app or backup codes.</p>
+                    <p><strong>Email Verification:</strong> Check your spam/junk folder for the verification email.</p>
+                    <p><strong>Browser Issues:</strong> Try clearing your browser cache and cookies, or use an incognito window.</p>
+                  </div>
+                </details>
+
+                <details className="group border border-white/10 rounded-xl p-4">
+                  <summary className="flex items-center justify-between cursor-pointer font-semibold hover:text-primary transition-colors">
+                    <span className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      Data Import Problems
+                    </span>
+                    <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" />
+                  </summary>
+                  <div className="mt-3 space-y-2 text-sm text-foreground-secondary">
+                    <p><strong>CSV Format:</strong> Ensure your CSV file has columns for Date, Description, Amount, and Category (optional).</p>
+                    <p><strong>Date Format:</strong> Use MM/DD/YYYY or DD/MM/YYYY format consistently throughout the file.</p>
+                    <p><strong>Amount Format:</strong> Use positive numbers for income, negative for expenses, or include a separate column for transaction type.</p>
+                    <p><strong>File Size:</strong> Large files may take time to process; try splitting into smaller batches if needed.</p>
+                    <p><strong>Encoding:</strong> Save your CSV file as UTF-8 encoding to avoid character issues.</p>
+                  </div>
+                </details>
               </div>
             </CardContent>
           </Card>
@@ -263,6 +278,7 @@ export default function HelpCenterPage() {
               </div>
             </CardContent>
           </Card>
+        </div>
         </div>
       </main>
     </div>
