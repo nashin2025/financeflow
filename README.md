@@ -476,3 +476,5 @@ This project is licensed under the MIT License.
 - [Zustand](https://zustand-demo.pmnd.rs/) — State management
 - [Recharts](https://recharts.org/) — Chart library
 - [Lucide](https://lucide.dev/) — Icon library
+
+<!-- Deploy trigger -->
