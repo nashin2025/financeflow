@@ -64,8 +64,13 @@ export function AddMoneyToGoalModal({ goal, isOpen, onClose }: AddMoneyToGoalMod
         console.error("API Error:", response.status, errorData);
         
         if (response.status === 404 && errorData.error === "Goal not found") {
+          console.log("Goal not found, syncing goals and cleaning up...");
           await syncGoals();
-          throw new Error("Goal not found. Please refresh and try again.");
+          // Remove the invalid goal from local storage
+          const { goals: allGoals, setGoals: updateGoalsStore } = useAppStore.getState();
+          const cleanedGoals = allGoals.filter(g => g.id !== goal.id);
+          updateGoalsStore(cleanedGoals);
+          throw new Error("Goal not found. Please refresh the page and try again.");
         }
         
         throw new Error(errorData?.error || `Failed to update goal (${response.status})`);
@@ -77,7 +82,8 @@ export function AddMoneyToGoalModal({ goal, isOpen, onClose }: AddMoneyToGoalMod
       // Reset form and close modal
       setAmount("");
       onClose();
-    } catch (err) {
+    }
+    catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to add money to goal. Please try again.";
       console.error('Add money error:', errorMessage);
       setError(errorMessage);

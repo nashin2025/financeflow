@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 
 export default function GoalsPage() {
-  const { goals, isPremium } = useAppStore();
+  const { goals, isPremium, syncGoals, setGoals } = useAppStore();
   const [showUpgradeMsg, setShowUpgradeMsg] = React.useState(false);
   const [celebration, setCelebration] = React.useState<{ goalName: string; milestone: number } | null>(null);
   const [selectedGoal, setSelectedGoal] = React.useState<Goal | null>(null);
@@ -41,6 +41,27 @@ export default function GoalsPage() {
     setSelectedGoal(goal);
     setShowDetailsModal(false);
   }, []);
+  const validateGoals = React.useCallback(async () => {
+    try {
+      const response = await fetch('/api/goals');
+      if (response.ok) {
+        const data = await response.json();
+    validateGoals();
+        const dbGoalIds = new Set(data.goals.map((g: any) => g.id));
+        const validGoals = goals.filter(goal => dbGoalIds.has(goal.id));
+        if (validGoals.length !== goals.length) {
+          console.log('Cleaned up' + (goals.length - validGoals.length) + ' orphaned goals');
+          setGoals(validGoals);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to validate goals:', error);
+    }
+  }, [goals, setGoals]);
+  // Sync goals with database on page load
+  React.useEffect(() => {
+    syncGoals();
+  }, [syncGoals]);
 
   const handleViewDetails = React.useCallback((goal: Goal) => {
     setSelectedGoal(goal);
