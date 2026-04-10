@@ -49,7 +49,7 @@ export default function AddAccountPage() {
   const [showSuccess, setShowSuccess] = React.useState(false);
   const [error, setError] = React.useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -81,13 +81,199 @@ export default function AddAccountPage() {
       updatedAt: new Date().toISOString(),
     };
 
-    addAccount(newAccount);
-    setShowSuccess(true);
+    // Save account to database
+    try {
+      const response = await fetch("/api/accounts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          type,
+          balance: 0,
+          currency: "MVR",
+          institution,
+          color,
+          icon: typeInfo?.icon || "🏦",
+          isActive: true,
+          userId: user?.id || "1",
+        }),
+      });
 
-    setTimeout(() => {
-      router.push("/accounts");
-    }, 1500);
-  };
+      if (!response.ok) {
+        throw new Error("Failed to save account");
+      }
+
+      const { account: savedAccount } = await response.json();
+      addAccount(savedAccount);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/accounts");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving account:", error);
+      setError("Failed to save account. Please try again.");
+    }    // Save account to database
+    try {
+      const response = await fetch("/api/accounts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          type,
+          balance: 0,
+          currency: "MVR",
+          institution,
+          color,
+          icon: typeInfo?.icon || "🏦",
+          isActive: true,
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save account");
+      }
+
+      const { account: savedAccount } = await response.json();
+      addAccount(savedAccount);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/accounts");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving account:", error);
+      setError("Failed to save account. Please try again.");
+    }    // Save account to database
+    try {
+      const response = await fetch("/api/accounts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          type,
+          balance: 0,
+          currency: "MVR",
+          institution,
+          color,
+          icon: typeInfo?.icon || "🏦",
+          isActive: true,
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save account");
+      }
+
+      const { account: savedAccount } = await response.json();
+      addAccount(savedAccount);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/accounts");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving account:", error);
+      setError("Failed to save account. Please try again.");
+    }    // Save account to database
+    try {
+      const response = await fetch("/api/accounts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          type,
+          balance: 0,
+          currency: "MVR",
+          institution,
+          color,
+          icon: typeInfo?.icon || "🏦",
+          isActive: true,
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save account");
+      }
+
+      const { account: savedAccount } = await response.json();
+      addAccount(savedAccount);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/accounts");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving account:", error);
+      setError("Failed to save account. Please try again.");
+    }    // Save account to database
+    try {
+      const response = await fetch("/api/accounts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          type,
+          balance: 0,
+          currency: "MVR",
+          institution,
+          color,
+          icon: typeInfo?.icon || "🏦",
+          isActive: true,
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save account");
+      }
+
+      const { account: savedAccount } = await response.json();
+      addAccount(savedAccount);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/accounts");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving account:", error);
+      setError("Failed to save account. Please try again.");
+    }    // Save account to database
+    try {
+      const response = await fetch("/api/accounts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          type,
+          balance: 0,
+          currency: "MVR",
+          institution,
+          color,
+          icon: typeInfo?.icon || "🏦",
+          isActive: true,
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save account");
+      }
+
+      const { account: savedAccount } = await response.json();
+      addAccount(savedAccount);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/accounts");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving account:", error);
+      setError("Failed to save account. Please try again.");
+    }  };
 
   const handleBalanceChange = (value: string) => {
     const cleaned = value.replace(/[^0-9.-]/g, "");

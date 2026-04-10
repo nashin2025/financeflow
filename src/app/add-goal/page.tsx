@@ -47,7 +47,7 @@ export default function AddGoalPage() {
   const [showSuccess, setShowSuccess] = React.useState(false);
   const [error, setError] = React.useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -82,13 +82,199 @@ export default function AddGoalPage() {
       createdAt: new Date().toISOString(),
     };
 
-    addGoal(newGoal);
-    setShowSuccess(true);
+    // Save goal to database
+    try {
+      const response = await fetch("/api/goals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          type,
+          targetAmount: parsedTarget,
+          currentAmount: 0,
+          targetDate: targetDate || undefined,
+          monthlyContribution: parsedMonthly,
+          icon: typeInfo?.icon || "🎯",
+          color,
+          userId: user?.id || "1",
+        }),
+      });
 
-    setTimeout(() => {
-      router.push("/goals");
-    }, 1500);
-  };
+      if (!response.ok) {
+        throw new Error("Failed to save goal");
+      }
+
+      const { goal: savedGoal } = await response.json();
+      addGoal(savedGoal);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/goals");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving goal:", error);
+      setError("Failed to save goal. Please try again.");
+    }    // Save goal to database
+    try {
+      const response = await fetch("/api/goals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          type,
+          targetAmount: parsedTarget,
+          currentAmount: 0,
+          targetDate: targetDate || undefined,
+          monthlyContribution: parsedMonthly,
+          icon: typeInfo?.icon || "🎯",
+          color,
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save goal");
+      }
+
+      const { goal: savedGoal } = await response.json();
+      addGoal(savedGoal);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/goals");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving goal:", error);
+      setError("Failed to save goal. Please try again.");
+    }    // Save goal to database
+    try {
+      const response = await fetch("/api/goals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          type,
+          targetAmount: parsedTarget,
+          currentAmount: 0,
+          targetDate: targetDate || undefined,
+          monthlyContribution: parsedMonthly,
+          icon: typeInfo?.icon || "🎯",
+          color,
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save goal");
+      }
+
+      const { goal: savedGoal } = await response.json();
+      addGoal(savedGoal);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/goals");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving goal:", error);
+      setError("Failed to save goal. Please try again.");
+    }    // Save goal to database
+    try {
+      const response = await fetch("/api/goals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          type,
+          targetAmount: parsedTarget,
+          currentAmount: 0,
+          targetDate: targetDate || undefined,
+          monthlyContribution: parsedMonthly,
+          icon: typeInfo?.icon || "🎯",
+          color,
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save goal");
+      }
+
+      const { goal: savedGoal } = await response.json();
+      addGoal(savedGoal);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/goals");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving goal:", error);
+      setError("Failed to save goal. Please try again.");
+    }    // Save goal to database
+    try {
+      const response = await fetch("/api/goals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          type,
+          targetAmount: parsedTarget,
+          currentAmount: 0,
+          targetDate: targetDate || undefined,
+          monthlyContribution: parsedMonthly,
+          icon: typeInfo?.icon || "🎯",
+          color,
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save goal");
+      }
+
+      const { goal: savedGoal } = await response.json();
+      addGoal(savedGoal);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/goals");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving goal:", error);
+      setError("Failed to save goal. Please try again.");
+    }    // Save goal to database
+    try {
+      const response = await fetch("/api/goals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          type,
+          targetAmount: parsedTarget,
+          currentAmount: 0,
+          targetDate: targetDate || undefined,
+          monthlyContribution: parsedMonthly,
+          icon: typeInfo?.icon || "🎯",
+          color,
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save goal");
+      }
+
+      const { goal: savedGoal } = await response.json();
+      addGoal(savedGoal);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/goals");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving goal:", error);
+      setError("Failed to save goal. Please try again.");
+    }  };
 
   const handleAmountChange = (setter: React.Dispatch<React.SetStateAction<string>>) => (value: string) => {
     const cleaned = value.replace(/[^0-9.]/g, "");

@@ -50,7 +50,7 @@ export default function AddTransactionPage() {
 
   const filteredCategories = categories.filter(c => c.type === (type === "expense" ? "expense" : "income"));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     
@@ -80,13 +80,223 @@ export default function AddTransactionPage() {
       updatedAt: new Date().toISOString(),
     };
 
-    addTransaction(newTransaction);
-    setShowSuccess(true);
-    
-    setTimeout(() => {
-      router.push("/transactions");
-    }, 1500);
-  };
+    // Save transaction to database
+    try {
+      const response = await fetch("/api/transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type,
+          amount: parsedAmount,
+          currency: "MVR",
+          description: description || "Transaction",
+          merchantName: description || "Transaction",
+          date,
+          note: note || undefined,
+          accountId,
+          categoryId: categoryId || filteredCategories[0]?.id || "1",
+          isRecurring,
+          isExcluded: false,
+          tags: [],
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save transaction");
+      }
+
+      const { transaction: savedTransaction } = await response.json();
+      addTransaction(savedTransaction);
+      setShowSuccess(true);
+      
+      setTimeout(() => {
+        router.push("/transactions");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving transaction:", error);
+      setError("Failed to save transaction. Please try again.");
+    }    // Save transaction to database
+    try {
+      const response = await fetch("/api/transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type,
+          amount: parsedAmount,
+          currency: "MVR",
+          description: description || "Transaction",
+          merchantName: description || "Transaction",
+          date,
+          note: note || undefined,
+          accountId,
+          categoryId: categoryId || filteredCategories[0]?.id || "1",
+          isRecurring,
+          isExcluded: false,
+          tags: [],
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save transaction");
+      }
+
+      const { transaction: savedTransaction } = await response.json();
+      addTransaction(savedTransaction);
+      setShowSuccess(true);
+      
+      setTimeout(() => {
+        router.push("/transactions");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving transaction:", error);
+      setError("Failed to save transaction. Please try again.");
+    }    // Save transaction to database
+    try {
+      const response = await fetch("/api/transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type,
+          amount: parsedAmount,
+          currency: "MVR",
+          description: description || "Transaction",
+          merchantName: description || "Transaction",
+          date,
+          note: note || undefined,
+          accountId,
+          categoryId: categoryId || filteredCategories[0]?.id || "1",
+          isRecurring,
+          isExcluded: false,
+          tags: [],
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save transaction");
+      }
+
+      const { transaction: savedTransaction } = await response.json();
+      addTransaction(savedTransaction);
+      setShowSuccess(true);
+      
+      setTimeout(() => {
+        router.push("/transactions");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving transaction:", error);
+      setError("Failed to save transaction. Please try again.");
+    }    // Save transaction to database
+    try {
+      const response = await fetch("/api/transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type,
+          amount: parsedAmount,
+          currency: "MVR",
+          description: description || "Transaction",
+          merchantName: description || "Transaction",
+          date,
+          note: note || undefined,
+          accountId,
+          categoryId: categoryId || filteredCategories[0]?.id || "1",
+          isRecurring,
+          isExcluded: false,
+          tags: [],
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save transaction");
+      }
+
+      const { transaction: savedTransaction } = await response.json();
+      addTransaction(savedTransaction);
+      setShowSuccess(true);
+      
+      setTimeout(() => {
+        router.push("/transactions");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving transaction:", error);
+      setError("Failed to save transaction. Please try again.");
+    }    // Save transaction to database
+    try {
+      const response = await fetch("/api/transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type,
+          amount: parsedAmount,
+          currency: "MVR",
+          description: description || "Transaction",
+          merchantName: description || "Transaction",
+          date,
+          note: note || undefined,
+          accountId,
+          categoryId: categoryId || filteredCategories[0]?.id || "1",
+          isRecurring,
+          isExcluded: false,
+          tags: [],
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save transaction");
+      }
+
+      const { transaction: savedTransaction } = await response.json();
+      addTransaction(savedTransaction);
+      setShowSuccess(true);
+      
+      setTimeout(() => {
+        router.push("/transactions");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving transaction:", error);
+      setError("Failed to save transaction. Please try again.");
+    }    // Save transaction to database
+    try {
+      const response = await fetch("/api/transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type,
+          amount: parsedAmount,
+          currency: "MVR",
+          description: description || "Transaction",
+          merchantName: description || "Transaction",
+          date,
+          note: note || undefined,
+          accountId,
+          categoryId: categoryId || filteredCategories[0]?.id || "1",
+          isRecurring,
+          isExcluded: false,
+          tags: [],
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save transaction");
+      }
+
+      const { transaction: savedTransaction } = await response.json();
+      addTransaction(savedTransaction);
+      setShowSuccess(true);
+      
+      setTimeout(() => {
+        router.push("/transactions");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving transaction:", error);
+      setError("Failed to save transaction. Please try again.");
+    }  };
 
   const handleAmountChange = (value: string) => {
     const cleaned = value.replace(/[^0-9.]/g, "");

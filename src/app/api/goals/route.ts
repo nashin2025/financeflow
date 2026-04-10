@@ -29,6 +29,35 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Failed to fetch goals' }, { status: 500 })
   }
 }
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+    const { name, type, targetAmount, currentAmount, targetDate, monthlyContribution, icon, color, userId } = body
+
+    if (!name || !targetAmount) {
+      return NextResponse.json({ error: "Name and target amount are required" }, { status: 400 })
+    }
+
+    const goal = await prisma.goal.create({
+      data: {
+        name,
+        type: type || "savings",
+        targetAmount: parseFloat(targetAmount),
+        currentAmount: parseFloat(currentAmount || 0),
+        targetDate: targetDate ? new Date(targetDate) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        monthlyContribution: monthlyContribution ? parseFloat(monthlyContribution) : 0,
+        icon: icon || "Target",
+        color: color || "#3B82F6",
+        userId: userId || "1",
+      },
+    })
+
+    return NextResponse.json({ goal, message: "Goal created successfully" })
+  } catch (error) {
+    console.error("Error creating goal:", error)
+    return NextResponse.json({ error: "Failed to create goal" }, { status: 500 })
+  }
+}
 
 export async function PUT(request: Request) {
   try {

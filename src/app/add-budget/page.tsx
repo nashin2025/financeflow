@@ -37,7 +37,7 @@ export default function AddBudgetPage() {
 
   const expenseCategories = categories.filter((c) => c.type === "expense");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -72,13 +72,181 @@ export default function AddBudgetPage() {
       remaining: parsedAmount,
     };
 
-    addBudget(newBudget);
-    setShowSuccess(true);
+    // Save budget to database
+    try {
+      const response = await fetch("/api/budgets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          categoryId,
+          amount: parsedAmount,
+          period,
+          startDate: now.toISOString().split('T')[0],
+          userId: user?.id || "1",
+        }),
+      });
 
-    setTimeout(() => {
-      router.push("/budgets");
-    }, 1500);
-  };
+      if (!response.ok) {
+        throw new Error("Failed to save budget");
+      }
+
+      const { budget: savedBudget } = await response.json();
+      addBudget(savedBudget);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/budgets");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving budget:", error);
+      setError("Failed to save budget. Please try again.");
+    }    // Save budget to database
+    try {
+      const response = await fetch("/api/budgets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          categoryId,
+          amount: parsedAmount,
+          period,
+          startDate: now.toISOString().split('T')[0],
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save budget");
+      }
+
+      const { budget: savedBudget } = await response.json();
+      addBudget(savedBudget);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/budgets");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving budget:", error);
+      setError("Failed to save budget. Please try again.");
+    }    // Save budget to database
+    try {
+      const response = await fetch("/api/budgets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          categoryId,
+          amount: parsedAmount,
+          period,
+          startDate: now.toISOString().split('T')[0],
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save budget");
+      }
+
+      const { budget: savedBudget } = await response.json();
+      addBudget(savedBudget);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/budgets");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving budget:", error);
+      setError("Failed to save budget. Please try again.");
+    }    // Save budget to database
+    try {
+      const response = await fetch("/api/budgets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          categoryId,
+          amount: parsedAmount,
+          period,
+          startDate: now.toISOString().split('T')[0],
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save budget");
+      }
+
+      const { budget: savedBudget } = await response.json();
+      addBudget(savedBudget);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/budgets");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving budget:", error);
+      setError("Failed to save budget. Please try again.");
+    }    // Save budget to database
+    try {
+      const response = await fetch("/api/budgets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          categoryId,
+          amount: parsedAmount,
+          period,
+          startDate: now.toISOString().split('T')[0],
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save budget");
+      }
+
+      const { budget: savedBudget } = await response.json();
+      addBudget(savedBudget);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/budgets");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving budget:", error);
+      setError("Failed to save budget. Please try again.");
+    }    // Save budget to database
+    try {
+      const response = await fetch("/api/budgets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          categoryId,
+          amount: parsedAmount,
+          period,
+          startDate: now.toISOString().split('T')[0],
+          userId: user?.id || "1",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save budget");
+      }
+
+      const { budget: savedBudget } = await response.json();
+      addBudget(savedBudget);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push("/budgets");
+      }, 1500);
+    } catch (error) {
+      console.error("Error saving budget:", error);
+      setError("Failed to save budget. Please try again.");
+    }  };
 
   const handleAmountChange = (value: string) => {
     const cleaned = value.replace(/[^0-9.]/g, "");
