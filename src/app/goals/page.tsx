@@ -25,11 +25,13 @@ import {
   DollarSign,
   MoreHorizontal,
   CheckCircle,
-  Crown
+  Crown,
+  RefreshCw
 } from "lucide-react";
 
 export default function GoalsPage() {
   const { goals, isPremium, syncGoals, setGoals } = useAppStore();
+  const [isSyncing, setIsSyncing] = React.useState(false);
   const [showUpgradeMsg, setShowUpgradeMsg] = React.useState(false);
   const [celebration, setCelebration] = React.useState<{ goalName: string; milestone: number } | null>(null);
   const [selectedGoal, setSelectedGoal] = React.useState<Goal | null>(null);
@@ -46,7 +48,6 @@ export default function GoalsPage() {
       const response = await fetch('/api/goals');
       if (response.ok) {
         const data = await response.json();
-    validateGoals();
         const dbGoalIds = new Set(data.goals.map((g: any) => g.id));
         const validGoals = goals.filter(goal => dbGoalIds.has(goal.id));
         if (validGoals.length !== goals.length) {
@@ -58,10 +59,20 @@ export default function GoalsPage() {
       console.error('Failed to validate goals:', error);
     }
   }, [goals, setGoals]);
-  // Sync goals with database on page load
   React.useEffect(() => {
-    syncGoals();
-  }, [syncGoals]);
+    const syncData = async () => {
+      setIsSyncing(true);
+      try {
+        await syncGoals();
+        await validateGoals();
+      } catch (error) {
+        console.error('Failed to sync goals on page load:', error);
+      } finally {
+        setIsSyncing(false);
+      }
+    };
+    syncData();
+  }, [syncGoals, validateGoals]);
 
   const handleViewDetails = React.useCallback((goal: Goal) => {
     setSelectedGoal(goal);
@@ -261,10 +272,37 @@ export default function GoalsPage() {
                 Track your progress toward your dreams
               </p>
             </div>
-            <Button onClick={handleCreateGoal}>
-              <Plus className="h-4 w-4 mr-2" />
-              New Goal
-            </Button>
+            <div className="flex items-center gap-3">
+              {isSyncing && (
+                <div className="flex items-center gap-2 text-sm text-foreground-secondary">
+                  <div className="w-4 h-4 border-2 border-primary-start border-t-transparent rounded-full animate-spin"></div>
+                  Syncing...
+                </div>
+              )}
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={async () => {
+                  setIsSyncing(true);
+                  try {
+                    await syncGoals();
+                    await validateGoals();
+                  } catch (error) {
+                    console.error('Manual sync failed:', error);
+                  } finally {
+                    setIsSyncing(false);
+                  }
+                }}
+                disabled={isSyncing}
+                title="Sync goals with database"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+              <Button onClick={handleCreateGoal} disabled={isSyncing}>
+                <Plus className="h-4 w-4 mr-2" />
+                New Goal
+              </Button>
+            </div>
           </div>
 
           {/* Overall Summary */}
