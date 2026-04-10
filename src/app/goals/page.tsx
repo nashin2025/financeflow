@@ -34,39 +34,36 @@ export default function GoalsPage() {
   const [isSyncing, setIsSyncing] = React.useState(false);
   const [showUpgradeMsg, setShowUpgradeMsg] = React.useState(false);
   const [celebration, setCelebration] = React.useState<{ goalName: string; milestone: number } | null>(null);
-  const [selectedGoal, setSelectedGoal] = React.useState<Goal | null>(null);
   const [goalToEdit, setGoalToEdit] = React.useState<Goal | null>(null);
   const [goalToDelete, setGoalToDelete] = React.useState<Goal | null>(null);
   const [showDetailsModal, setShowDetailsModal] = React.useState(false);
 
   const handleAddMoney = React.useCallback((goal: Goal) => {
     setSelectedGoal(goal);
-    setShowDetailsModal(false);
-  }, []);
-  const validateGoals = React.useCallback(async () => {
+  const validateGoals = React.useCallback(async (currentGoals: Goal[]) => {
     try {
       const response = await fetch('/api/goals');
       if (response.ok) {
         const data = await response.json();
         const dbGoalIds = new Set(data.goals.map((g: any) => g.id));
-        const validGoals = goals.filter(goal => dbGoalIds.has(goal.id));
-        if (validGoals.length !== goals.length) {
-          console.log('Cleaned up' + (goals.length - validGoals.length) + ' orphaned goals');
+        const validGoals = currentGoals.filter(goal => dbGoalIds.has(goal.id));
+        if (validGoals.length !== currentGoals.length) {
+          console.log('Cleaned up' + (currentGoals.length - validGoals.length) + ' orphaned goals');
           setGoals(validGoals);
         }
       }
     } catch (error) {
       console.error('Failed to validate goals:', error);
     }
-  }, [goals, setGoals]);
+  }, [setGoals]);
   React.useEffect(() => {
     const syncData = async () => {
       setIsSyncing(true);
       try {
         await syncGoals();
         await validateGoals();
+        goalsRef.current = goals;
       } catch (error) {
-        console.error('Failed to sync goals on page load:', error);
       } finally {
         setIsSyncing(false);
       }
